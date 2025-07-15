@@ -1,0 +1,4236 @@
+local _ENV = _ENV or getgenv();
+
+_ENV.DevBuild = true;
+
+-- Keep in mind this does not prevent you at all from getting banned :p
+-- 07/04/2025 -> Rewrote UI to Rayfield
+
+local _ = [[hello geys]]
+_=pcall;_=function(c)return c end;
+_([[
+        https://imgur.com/X2TJsB1 - https://imgur.com/a/GMvVd0e [so scaryyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy]
+]])
+
+
+if _ENV.v3instns then
+    for _, v in _ENV.v3instns do 
+        v.Value = false
+        v.Parent = nil 
+    end
+end
+
+local POSSIBLE_CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+
+function GET_RANDOM_HIDDEN(length)
+    local result = ""
+    for i = 1, length do
+        local indx = math.random(1, #POSSIBLE_CHARACTERS)
+        result = result .. POSSIBLE_CHARACTERS:sub(indx, indx)
+    end
+    return result
+end
+
+_ENV.index = GET_RANDOM_HIDDEN(math["random"](30,47))
+_ENV.__index = GET_RANDOM_HIDDEN(math["random"](69,420))
+
+if game:GetService("CoreGui"):FindFirstChild(_ENV.index) then
+    game:GetService("CoreGui")[_ENV.index]:Destroy()
+end
+
+local ProtectedFolder = Instance.new("Folder",game:GetService("CoreGui"))
+ProtectedFolder.Name = _ENV.index
+
+local ProcFolder = Instance.new("Folder", gethui())
+ProcFolder.Name = _ENV.__index
+
+_ENV.index = nil;
+_ENV.__index = nil;
+
+
+--[==[ CLEAR SPACE ]==]--
+
+
+
+
+
+
+
+
+
+
+--[== MAIN LOOPS ]==]--
+_ENV.RunServiceLoop = nil
+_ENV.FormatReal = nil
+_ENV.QTE_Enabled = nil
+
+--[==[ DISCONNECT ANY ONGOING CONS ]==]--
+if _ENV.Connections then
+    for Index, conn in pairs(_ENV.Connections) do
+        conn:Disconnect()
+    end
+end
+
+_ENV.Connections = {}
+
+local notificationLibrary = loadstring(game:HttpGet("https://raw.githubusercontent.com/laagginq/ui-libraries/main/xaxas-notification/src.lua"))();
+local notifications = notificationLibrary.new({            
+    NotificationLifetime = 7, 
+    NotificationPosition = "Middle",
+    
+    TextFont = Enum.Font.Code,
+    TextColor = Color3.fromRGB(255, 255, 255),
+    TextSize = 15,
+    
+    TextStrokeTransparency = 0, 
+    TextStrokeColor = Color3.fromRGB(0, 0, 0)
+});
+
+local ESP_Objects = {}
+local Camera = workspace.CurrentCamera
+local RunService = game:GetService("RunService")
+
+local function GetPrimaryPosition(Object)
+    if Object:IsA("Model") and Object.PrimaryPart then
+        return Object.PrimaryPart.Position
+    elseif Object:IsA("BasePart") then
+        return Object.Position
+    end
+    return nil
+end
+
+local function CreateESP(Object)
+    if not Object or ESP_Objects[Object] or Object:FindFirstChild("ESPCreated") then return end
+    if not (Object:IsA("BasePart") or (Object:IsA("Model") and Object.PrimaryPart)) then return end
+
+    local ESPCreated = Instance.new("IntValue")
+    ESPCreated.Name = "ESPCreated"
+    ESPCreated.Parent = Object
+
+    local Tracer = Drawing.new("Line")
+    Tracer.Thickness = 2
+    Tracer.Color = Color3.fromRGB(255, 255, 255)
+
+    local NameTag = Drawing.new("Text")
+    NameTag.Size = 14
+    NameTag.Color = Color3.fromRGB(255, 255, 255)
+
+    ESP_Objects[Object] = {
+        Tracer = Tracer,
+        NameTag = NameTag
+    }
+end
+
+local function UpdateESP()
+    for Object, Elements in pairs(ESP_Objects) do
+        local Position = GetPrimaryPosition(Object)
+        if Object and Position and Object:IsDescendantOf(workspace) then
+            local ScreenPosition, OnScreen = Camera:WorldToViewportPoint(Position)
+
+            if OnScreen then
+                Elements.Tracer.From = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y)
+                Elements.Tracer.To = Vector2.new(ScreenPosition.X, ScreenPosition.Y)
+                Elements.Tracer.Visible = true
+
+                local Distance = (Camera.CFrame.Position - Position).Magnitude
+                Elements.NameTag.Text = string.format("%s | %.2f studs", Object.Name, Distance)
+                Elements.NameTag.Position = Vector2.new(ScreenPosition.X - 20, ScreenPosition.Y - 60)
+                Elements.NameTag.Visible = true
+            else
+                Elements.Tracer.Visible = false
+                Elements.NameTag.Visible = false
+            end
+        else
+            Elements.Tracer:Remove()
+            Elements.NameTag:Remove()
+            ESP_Objects[Object] = nil
+        end
+    end
+end
+
+RunService.Heartbeat:Connect(UpdateESP)
+
+CreateESP()
+notifications:BuildNotificationUI();
+local RandomPossibleMessages = {"Enjoy using this script! 😃", "Enjoy using this script sigma ✅✅!"}
+notifications:Notify(RandomPossibleMessages[math.random(1, #RandomPossibleMessages)]);
+
+local Dependencies = {}
+local Existing = {}
+
+local MainScript = {function(...) 
+    local ARGS = {...} 
+    local MSG = ARGS[1] 
+    MSG = tostring(MSG) 
+    return "[CHAIN DEBUG]: " .. MSG 
+end, function() end}
+
+
+local GameService = {game}
+
+do
+    function GameService:GetService(...)
+        local ARGUMENTS = {...}
+        local SERVICE_NAME = ARGUMENTS[1]
+        local RES_SERVICE
+
+        local SUC, ERR = pcall(function()
+            RES_SERVICE = GameService[1]:GetService(SERVICE_NAME)
+        end)
+
+        if SUC and RES_SERVICE then
+            return RES_SERVICE
+        else
+            return ERR
+        end
+    end
+end
+
+local Prox = {
+    UIService = {
+        SetCore = function(...)
+            local ARGUMENTS = {...}
+            local CORE, NEW_CORE = ARGUMENTS[2], ARGUMENTS[3]
+
+            local UI = GameService:GetService("StarterGui")
+            local SUC, ERR = pcall(function()
+                UI:SetCore(CORE, NEW_CORE)
+            end)
+
+            if SUC then
+                return true
+            end
+            return ERR, false
+        end
+    },
+    Players = GameService:GetService("Players")
+}
+
+local Config = {}
+local PlaceIDs = {10204250851,13977939077,14695890495}
+
+--[==[  Check Place Id   ]==]--
+    
+local checkPlcId = nil
+local _, AnyError = xpcall(function()
+    if table.find(PlaceIDs, GameService[1].PlaceId) then
+        if GameService[1].PlaceId == PlaceIDs[1] then
+            checkPlcId = "Lobby"
+        else
+            checkPlcId = "Game"
+        end
+    else
+        checkPlcId = "None"
+    end
+end, function(AnyError3)
+    print("Error checking place ID:", AnyError3)
+end)
+
+task.delay(1, function()
+    if checkPlcId == "None" then
+        Dependencies.Notification(
+            "Game", 
+            "Game ID was not found",
+            5
+        )
+        return;
+    end
+end)
+
+--[==[   Set up Dependencies   ]==]--
+
+do
+    function Dependencies.Notification(Title, Text, Duration)
+        Duration = Duration or 5
+        return Prox.UIService:SetCore("SendNotification", {
+            Title = Title,
+            Text = Text,
+            Duration = Duration
+        })
+    end
+
+    function Dependencies.GetCurrentCharacter()
+        return (Prox.Players.LocalPlayer.Character ~= nil and Prox.Players.LocalPlayer.Character or nil)
+    end
+
+    function Dependencies.GetPlayerStats()
+        local Character = Dependencies.GetCurrentCharacter()
+        return (Character and Character:WaitForChild("Stats")) or nil
+    end
+
+    function Dependencies.GetChainAI()
+        local Misc = game:GetService("Workspace"):FindFirstChild("Misc")
+        local AI = Misc and Misc:WaitForChild("AI")
+        return (AI and AI:FindFirstChild("CHAIN")) or nil
+    end
+
+    function Dependencies.CreateChainESP(chainAI, enabled)
+        if enabled then
+            CreateESP(chainAI:FindFirstChild("Head"))
+        end
+    end
+
+    function Dependencies.GetChildrenOf(instance)
+        local Children = {}
+        for _, child in instance:GetChildren() do
+            table.insert(Children, child)
+        end
+        return Children
+    end 
+end
+
+--[==[   Script   ]==]
+
+function MainScript.Init()
+    for _, func in ipairs(MainScript) do
+        if type(func) == "function" and func ~= MainScript[1] then
+            task.spawn(func)
+        end
+    end
+end
+
+function callFunc(func,args)
+    local x = type
+    if args and x(args) == 'table' and #args > 0 then
+        return func(table.unpack(args))
+    else    
+        return func()
+    end
+end
+
+--[==[   real script   ]==]--
+
+MainScript.SafeCall = function(func)
+    local CatchError = ""
+    local MainCall = _ENV.xpcall(function()
+        callFunc(func,args)
+    end, function(...)
+        CatchError = ...
+    end)
+
+    if CatchError ~= "" then
+        return CatchError;
+    end
+
+    return nil
+end
+
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+local Window = Rayfield:CreateWindow({
+    Name = version(),
+    Icon = 0,
+    LoadingTitle = "just a chain utility tool no exploits!!!",
+    LoadingSubtitle = "🤖⚠️✅⏱️❔",
+    Theme = "Default",
+ 
+    DisableRayfieldPrompts = false,
+    DisableBuildWarnings = false,
+ 
+    ConfigurationSaving = {
+       Enabled = true,
+       FolderName = nil,
+       FileName = "chain-hax"
+    },
+ 
+    Discord = {
+       Enabled = false,
+       Invite = "noinvitelink",
+       RememberJoins = true
+    },
+ 
+    KeySystem = false, 
+    KeySettings = {
+       Title = "Untitled",
+       Subtitle = "Key System",
+       Note = "No method of obtaining the key is provided",
+       FileName = "Key",
+       SaveKey = true,
+       GrabKeyFromSite = false,
+       Key = {"Hello"}
+    }
+})
+
+local Main = Window:CreateTab("[🟢] Main", 4483362458)
+local OP = Window:CreateTab("[🟢] OP", 4483362458)
+local Vis = Window:CreateTab("[🟢] Visuals", 4483362458)
+local chain = Window:CreateTab("[🟢] Chain", 4483362458)
+local guns = Window:CreateTab("[🟢] Weapons", 4483362458)
+local Dev;
+local istheplayersigma = false
+
+if DevBuild == true then
+    Dev = Window:CreateTab("Developer Utils", 4483362458)
+    Dev:CreateSection("Adonis bypass, inf yield, ye")
+    istheplayersigma = true
+end
+
+Rayfield:Notify({
+    Title = "",
+    Content = "sup!",
+    Duration = 5.5,
+    Image = 4483362458,
+})
+
+local S,E = Main:CreateSection("Simple features"), OP:CreateSection("OP features")
+Vis:CreateSection("Clientsided features ig [toggle bloodmoon affects the spellbook thing, only the windup, not success]")
+guns:CreateSection("Clientsided exploits but they work serversided for some reason")
+
+local fakeee = ProcFolder;
+local infstats = Instance.new("BoolValue", fakeee) infstats.Value=false
+local espchain = Instance.new("BoolValue", fakeee) espchain.Value=false
+local espbeartraps = Instance.new("BoolValue", fakeee) espbeartraps.Value=false
+local espartifacts = Instance.new("BoolValue", fakeee) espartifacts.Value=false
+local Useless = Instance.new("BoolValue", fakeee) Useless.Value=false   
+
+
+_ENV.v3instns = {infstats,espchain,espbeartraps,espartifacts,Useless} --[==[Define 'v3instns']==]--
+
+local function createanormalespfr(model, enabled)
+    if enabled then
+        CreateESP(model)
+    end
+end
+
+local __met = {
+    function(v)
+        local stats = Dependencies.GetPlayerStats()
+        if stats then
+            stats:SetAttribute("Infinite", v)
+        end
+    end;
+    function()
+        local Scraps = workspace.Misc.Zones.LootingItems.Scrap
+        for _, Scrap in Dependencies.GetChildrenOf(Scraps) do
+            if Scrap:IsA("Model") then
+                if Scrap:FindFirstChild("GearMain") and Scrap.PrimaryPart then
+                    canContinue = true
+                end
+            end
+        end
+
+        for _, Scrap in Dependencies.GetChildrenOf(Scraps) do
+            if Scrap:IsA("Model") and Scrap.PrimaryPart ~= nil and Scrap:FindFirstChild("GearMain") then
+                createanormalespfr(Scrap, true)
+            end
+        end
+    end,
+    function()
+        local Scraps = workspace.Misc.Zones.LootingItems.Scrap
+        if Dependencies.GetCurrentCharacter() then
+            local Char = Dependencies.GetCurrentCharacter()
+            local Root = Char.PrimaryPart
+            local Old = Root.CFrame;
+        
+            local canContinue = false
+            for _, Scrap in Dependencies.GetChildrenOf(Scraps) do
+                if Scrap:IsA("Model") then
+                    if Scrap:FindFirstChild("GearMain") and Scrap.PrimaryPart then
+                        canContinue = true
+                    end
+                end
+            end
+    
+            if not canContinue then return end
+    
+            for _, Scrap in Dependencies.GetChildrenOf(Scraps) do
+                if Scrap:IsA("Model") and Scrap.PrimaryPart ~= nil and Scrap:FindFirstChild("GearMain") and Scrap:FindFirstChild("GearMain").Transparency ~= 1 then
+                    local camera = workspace.CurrentCamera
+                    local GearMain = Scrap.PrimaryPart
+                    local Cf = GearMain.CFrame
+                    local Prompt = Scrap.Prompt.ProximityPrompt
+                    local Func = fireproximityprompt
+    
+                    Root.CFrame = Cf
+                    for i = 1,5 do
+                        camera.CFrame = CFrame.new(camera.CFrame.Position, GearMain.Position)
+                        task.wait()
+                    end
+                    task.wait(0.2)
+                    Func(Prompt, 1)
+                    task.wait(0.1)
+                    Func(Prompt, 0) 
+                end
+            end
+    
+            Root.CFrame = Old
+        end
+    end;
+}
+
+local function isArtifactActive(artifact)
+    return artifact:GetAttribute("LifeSpan") > 0 and artifact:GetAttribute("CanCollect") == true
+end
+
+local artifactsartifacts = workspace.Misc.Zones.LootingItems.Artifacts
+local BearTrapsFolder = workspace.GameStuff.PlayerStuff.BearTraps
+
+local function create_bear_esp(model, enabled)
+    if enabled then
+        CreateESP(model)
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    for _, trap in BearTrapsFolder:GetChildren() do
+        create_bear_esp(trap, espbeartraps.Value)
+    end
+end)
+
+--[==[ GUNS ]==]--
+
+local AKSpoof = guns:CreateButton({
+    Name = "[🟢] Infinite AK Ammo";
+    Callback = function()
+        local Name = Prox.Players.LocalPlayer.Name;
+        local _, __ = pcall(function(...)
+            workspace[Name].Items["AK47"]:SetAttribute("Ammo", workspace[Name].Items["AK47"]:GetAttribute("MaxAmmo"))
+        end)
+
+        notifications:Notify("[Success]: ".. tostring(_))
+    end
+})
+
+local DeagleSpoof = guns:CreateButton({
+    Name = "[🟢] Infinite Deagle Ammo";
+    Callback = function()
+        local Name = Prox.Players.LocalPlayer.Name;
+        local _, __ = pcall(function(...)
+            workspace[Name].Items["Deagle"]:SetAttribute("Ammo", workspace[Name].Items["Deagle"]:GetAttribute("MaxAmmo"))
+        end)
+        notifications:Notify("[Success]: ".. tostring(_))
+    end
+})
+
+local DBSpoof = guns:CreateButton({
+    Name = "[🟢] Infinite Double Barrel Ammo";
+    Callback = function()
+        local Name = Prox.Players.LocalPlayer.Name;
+        local _, __ = pcall(function(...)
+            workspace[Name].Items["DoubleBarrel"]:SetAttribute("Ammo", workspace[Name].Items["DoubleBarrel"]:GetAttribute("MaxAmmo"))
+        end)
+        notifications:Notify("[Success]: ".. tostring(_))
+    end
+})
+
+local M1911Spoof = guns:CreateButton({
+    Name = "[🟢] Infinite M1911 Ammo";
+    Callback = function()
+        local Name = Prox.Players.LocalPlayer.Name;
+        local _, __ = pcall(function(...)
+            workspace[Name].Items["M1911"]:SetAttribute("Ammo", workspace[Name].Items["M1911"]:GetAttribute("MaxAmmo"))
+        end)
+        notifications:Notify("[Success]: ".. tostring(_))
+    end
+})
+
+local DBSpoof = guns:CreateButton({
+    Name = "[🟢] Undrainable X-Saw Gas";
+    Callback = function()
+        local Name = Prox.Players.LocalPlayer.Name;
+        local _, __ = pcall(function(...)
+            workspace[Name].Items["XSaw"]:SetAttribute("Gas", 99.5)
+        end)
+        notifications:Notify("[Success]: ".. tostring(_))
+    end
+})
+
+local glitch = Vis:CreateButton({
+    Name = "[🟢] Glitch Effect",
+    Callback = function()
+        function GlitchEffectMain()
+            local GlitchEff = GameService:GetService("Players").LocalPlayer.PlayerGui.Ingame.MechanicsFrame.Glitch
+            local MainSound = GlitchEff.Sound
+            GlitchEff.ImageTransparency = 0
+            GlitchEff.Visible = true
+            MainSound:Play()
+            task.wait(0.35)
+            GlitchEff.Visible = false
+            GlitchEff.ImageTransparency = 1
+            MainSound:Stop()
+        end
+        
+        task.delay(2, GlitchEffectMain)
+    end
+})
+
+local bm_effect = Vis:CreateButton({
+    Name = "[🟢] Toggle Blood Moon Effect",
+    Callback = function()
+        local isCurrentBM = workspace.GameStuff.Values:GetAttribute("BloodMoon")
+        if isCurrentBM then
+            workspace.GameStuff.Values:SetAttribute("BloodMoon", false)
+            workspace.GameStuff.Music.BloodMoonAmbient:Stop()
+            workspace.GameStuff.Music.BloodMoonAmbient2:Stop()
+            workspace.GameStuff.Music.BloodMoonBegin:Stop()
+        elseif not isCurrentBM then
+            workspace.GameStuff.Values:SetAttribute("BloodMoon", true)
+            workspace.GameStuff.Music.BloodMoonAmbient:Play()
+            workspace.GameStuff.Music.BloodMoonAmbient2:Play()
+        end
+    end
+})
+
+local SetFOV = 70
+local DoFOV = false
+
+local FOV_Value = Vis:CreateSlider({
+    Name = "FOV",
+    Range = {0, 120},
+    Increment = 1,
+    Suffix = "FieldOfView",
+    CurrentValue = 70,
+    Flag = "FOV",
+    Callback = function(Value)
+        SetFOV = Value;
+    end,
+})
+
+local Toggle = Vis:CreateToggle({
+    Name = "Custom FOV",
+    CurrentValue = false,
+    Flag = "F_O-V",
+    Callback = function(Value)
+        DoFOV = Value;
+        notifications:Notify("[FOV]: Set custom FOV to " .. tostring(DoFOV))
+    end,
+})
+
+local shop = Main:CreateButton({
+    Name = "[🟢] Open Shop",
+    Callback = function()
+        GameService:GetService("Players").LocalPlayer.PlayerGui.Ingame.Shop.Visible = true
+    end
+})
+
+local CantDodge = Main:CreateButton({
+    Name = "[🟢] Destroy CantDodge",
+    Callback = function()
+        local S,E = pcall(function()
+            Dependencies.GetCurrentCharacter().Humanoid.CantDodge:Destroy()
+        end)
+        if S then
+            notifications:Notify("[CantDodge]: Succesfully destroyed!")
+        end
+        local IsCantDodgeFoundErr = (
+            E == string.format('CantDodge is not a valid member of Humanoid "Workspace.%s.Humanoid"', Prox.Players.LocalPlayer.Name) and true or false
+        )
+        if IsCantDodgeFoundErr then
+            return notifications:Notify("[CantDodge]: You can normally dodge? no need to destroy")
+        end
+
+        notifications:Notify("[CantDodge]: Unknown error detected - "..tostring(E))
+    end
+})
+
+local scrap = Main:CreateButton({
+    Name = "[🟢] Collect Scrap",
+    Callback = __met[3]
+})
+
+local ESP_Scrap = Main:CreateButton({
+    Name = "[🟢] ESP Scrap",
+    Callback = function()
+        if not Drawing or not Drawing.new then
+            notifications:Notify("[ESP Scrap]: Missing Drawing.new library [Highlighting is coming soon]")
+            return;
+        end;
+
+        notifications:Notify("[ESP Scrap]: Called function (you sometimes need more graphic bars to see any esp)")
+        __met[2]()
+    end
+})
+
+local FakeGas = Main:CreateButton({
+    Name = "[🟢] Refill Gas",
+    Callback = function()
+        local S,E = pcall(function(...)
+            workspace[GameService:GetService("Players").LocalPlayer.Name].Items.XSaw:SetAttribute("Gas",99)
+        end)
+
+        if S then
+            return notifications:Notify("[Gas]: Updated Gas! You need 0w for it to not reduce your gas again")
+        end
+
+        notifications:Notify("[Gas]: Error detected:", tostring(E))
+    end
+})
+
+if istheplayersigma then
+    local AdonisByp = Dev:CreateButton({
+        Name = "[🟢] Adonis Bypass",
+        Callback = function()
+            local adonis = "https://raw.githubusercontent.com/Pixeluted/adoniscries/refs/heads/main/Source.lua"
+            loadstring(game:HttpGet(adonis))()
+            notifications:Notify("[Adonis Bypass]: Executed!")
+        end
+    })
+end
+
+local DONE = false;
+local FakeCam = Main:CreateButton({
+    Name = "[🟢] Camera",
+    Callback = function()
+        if not getrawmetatable or not getnamecallmethod or not setreadonly then
+            notifications:Notify("[Camera]: No work with your executor: " .. tostring(identifyexecutor()))
+            return;
+        end
+
+        if DONE then
+            notifications:Notify("[Camera]: Already have it. [Press MB2]")
+            return
+        end
+
+        DONE = true;
+        local mt = getrawmetatable(game)
+        setreadonly(mt, false)
+
+        local MK = GameService:GetService("MarketplaceService")
+        local __namecall = mt.__namecall
+
+        mt.__namecall = newcclosure(function(self, ...)
+            local method = getnamecallmethod()
+            local args = { ... }
+
+            if self == MK and method == "UserOwnsGamePassAsync" then
+                if args[2] == 72818742 then
+                    return true
+                end
+            end
+
+            return __namecall(self, ...)
+        end)
+
+        setreadonly(mt, true)
+    end
+})
+
+local AK_Shoot = Main:CreateButton({
+    Name = "[🟢] Shoot AK",
+    Callback = function()
+        local args = {
+            [1] = {
+                ["YMax"] = -5,
+                ["XMax"] = -2,
+                ["TacticalReloadAnimationSpeed"] = 1,
+                ["CanSpinPart"] = false,
+                ["AngleX_Min"] = 1,
+                ["Lifesteal"] = 0,
+                ["MeleeCriticalDamageEnabled"] = false,
+                ["SilenceEffect"] = false,
+                ["ExplosionCraterFadeTime"] = 1,
+                ["Accuracy"] = 0.9,
+                ["GoreSoundVolume"] = 1,
+                ["MeleeHitEffectEnabled"] = true,
+                ["DropVelocity"] = 10,
+                ["CustomMeleeHitEffect"] = false,
+                ["WhizDistance"] = 35,
+                ["ProjectileMotion"] = false,
+                ["WhizSoundPitchMin"] = 1,
+                ["ReloadAnimationSpeed"] = 1,
+                ["Gravity"] = Vector2.new(0, 1000),
+                ["SpreadRedutionS"] = 0.6,
+                ["VisibleTime"] = 0.01,
+                ["HoldDownAnimationSpeed"] = 0.5,
+                ["ScopeSwaySpeed"] = 15,
+                ["HoldingTime"] = 1,
+                ["HeatPerFireMax"] = 8,
+                ["MeleeBloodEnabled"] = true,
+                ["MeleeKnockback"] = 0,
+                ["MeleeDamage"] = 20,
+                ["MeleeBloodWoundTexture"] = {
+                    [1] = 2078626
+                },
+                ["EasingStyleNAD"] = Enum.EasingStyle.Quint,
+                ["ScopeKnockbackMultiplier"] = 5,
+                ["BulletHoleVisibleTime"] = 3,
+                ["AimIdleAnimationSpeed"] = 1,
+                ["MeleeHitSoundIDs"] = {
+                    [1] = 6000828622
+                },
+                ["PreShotgunReload"] = false,
+                ["BulletPerBurst"] = 3,
+                ["MeleeHitSoundPitchMin"] = 1,
+                ["ShotsForDepletion"] = 12,
+                ["HitmarkerSoundID"] = {
+                    [1] = 3748776946,
+                    [2] = 3748777642,
+                    [3] = 3748780065
+                },
+                ["MarkerEffectEnabled"] = true,
+                ["MuzzleLightEnabled"] = true,
+                ["DualEnabled"] = false,
+                ["RecoilRedution"] = 0.4,
+                ["EasingStyle"] = Enum.EasingStyle.Quint,
+                ["CrossExpansion"] = 100,
+                ["BloodWoundFadeTime"] = 1,
+                ["MeleeLifesteal"] = 0,
+                ["DisappearTime"] = 5,
+                ["ExplosionSoundIDs"] = {
+                    [1] = 163064102
+                },
+                ["BloodWoundPartColor"] = false,
+                ["MeleeHitSoundPitchMax"] = 1.5,
+                ["ExplosionKnockbackMultiplierOnPlayer"] = 2,
+                ["ADSLerpAlpha"] = 0.25,
+                ["PenetrationAmount"] = 0,
+                ["ShotgunPumpinSpeed"] = 0.5,
+                ["PenetrationType"] = "HumanoidPenetration",
+                ["DropXMax"] = 5,
+                ["HitmarkerSoundPitchHS"] = 1,
+                ["LowAmmo"] = true,
+                ["BulletShellRotVelocity"] = 40,
+                ["MeleeBloodWoundFadeTime"] = 1,
+                ["ADSCFrame"] = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+                ["EasingDirectionNAD"] = Enum.EasingDirection.Out,
+                ["MeleeBloodWoundSize"] = 0.5,
+                ["LightBrightness"] = 4,
+                ["HitmarkerFadeTime"] = 0.4,
+                ["SelfKnockbackMultiplier"] = 2,
+                ["BulletHoleFadeTime"] = 1,
+                ["MaximumTime"] = 1,
+                ["ChargingTime"] = 1,
+                ["InspectAnimationSpeed"] = 1,
+                ["BulletSpeed"] = 2400,
+                ["SelfKnockback"] = false,
+                ["MeleeHitCharSndPitchMax"] = 1,
+                ["CrossScaleIS"] = 0.6,
+                ["IronsightEnabled"] = true,
+                ["SpreadPattern"] = {
+                    [1] = {
+                        [1] = 0,
+                        [2] = -0.4
+                    },
+                    [2] = {
+                        [1] = -0.35,
+                        [2] = 0.2
+                    },
+                    [3] = {
+                        [1] = 0.35,
+                        [2] = 0.2
+                    },
+                    [4] = {
+                        [1] = 0,
+                        [2] = 1
+                    },
+                    [5] = {
+                        [1] = 0.95,
+                        [2] = 0.31
+                    },
+                    [6] = {
+                        [1] = 0.59,
+                        [2] = -0.81
+                    },
+                    [7] = {
+                        [1] = -0.59,
+                        [2] = -0.81
+                    },
+                    [8] = {
+                        [1] = -0.95,
+                        [2] = 0.31
+                    }
+                },
+                ["SmokeTrailEnabled"] = false,
+                ["MeleeAttackEnabled"] = false,
+                ["HeadshotEnabled"] = true,
+                ["WalkSpeedRedution"] = 6,
+                ["AngleZ_Max"] = 1,
+                ["MinigunRevDownAnimationSpeed"] = 1,
+                ["FirstPersonArms"] = false,
+                ["FieldOfViewIS"] = 50,
+                ["IdleAnimationSpeed"] = 1,
+                ["DelayBeforeFiring"] = 1,
+                ["ScopeSwayDamper"] = 0.65,
+                ["SpreadRedutionIS"] = 1,
+                ["TimeBeforeCooldown"] = 3,
+                ["MouseSensitiveS"] = 0.2,
+                ["Controller"] = {
+                    ["HoldDown"] = Enum.KeyCode.DPadUp,
+                    ["Melee"] = Enum.KeyCode.ButtonR3,
+                    ["Inspect"] = Enum.KeyCode.DPadDown,
+                    ["Switch"] = Enum.KeyCode.DPadRight,
+                    ["Fire"] = Enum.KeyCode.ButtonR1,
+                    ["ToogleAim"] = Enum.KeyCode.ButtonL1,
+                    ["Reload"] = Enum.KeyCode.ButtonX
+                },
+                ["SelfKnockbackPower"] = 50,
+                ["EquipTime"] = 0,
+                ["BurstFireEnabled"] = false,
+                ["XMin"] = -4,
+                ["MarkerPartColor"] = true,
+                ["MarkerEffectTexture"] = {
+                    [1] = 2078626
+                },
+                ["BloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                ["TweenLengthNAD"] = 0.8,
+                ["Drag"] = 1,
+                ["MaxCount"] = 200,
+                ["CriticalBaseChance"] = 5,
+                ["GoreSoundPitchMin"] = 1,
+                ["MeleeBloodWoundEnabled"] = true,
+                ["GoreEffectEnabled"] = false,
+                ["OverheatAnimationSpeed"] = 1,
+                ["BurstRate"] = 0.075,
+                ["ShellTextureID"] = 95391833,
+                ["BulletHoleTexture"] = {
+                    [1] = 3696144972
+                },
+                ["AimAnimationsEnabled"] = false,
+                ["Recoil"] = {
+                    ["y"] = {
+                        [1] = 11,
+                        [2] = 16
+                    },
+                    ["x"] = {
+                        [1] = -2,
+                        [2] = 2
+                    },
+                    ["z"] = {
+                        [1] = -5,
+                        [2] = 5
+                    },
+                    ["speed"] = 20,
+                    ["damper"] = 0.35,
+                    ["recoilBackSize"] = 4.95
+                },
+                ["MeleeAttackRange"] = 4,
+                ["HitCharSndPitchMax"] = 1,
+                ["Range"] = 5000,
+                ["MaxHeat"] = 100,
+                ["FirstPersonArmADS"] = false,
+                ["DropYMax"] = 0,
+                ["ExplosionRadius"] = 8,
+                ["DropXMin"] = -5,
+                ["AfflictionName"] = "",
+                ["BulletShellParticles"] = false,
+                ["ShotgunPumpinAnimationSpeed"] = 1,
+                ["BurstRates"] = {
+                    [1] = 0,
+                    [2] = 0.075,
+                    [3] = 0.075,
+                    [4] = 0
+                },
+                ["MeleeHeadshotEnabled"] = true,
+                ["WhizSoundEnabled"] = true,
+                ["HoldAndReleaseEnabled"] = false,
+                ["AngleX_Max"] = 1,
+                ["Level1ChargingTime"] = 1,
+                ["SelectiveFireEnabled"] = false,
+                ["CriticalDamageEnabled"] = false,
+                ["AllowCollide"] = false,
+                ["SwitchAnimationSpeed"] = 1,
+                ["ShotgunEnabled"] = false,
+                ["EasingDirection"] = Enum.EasingDirection.Out,
+                ["MouseSensitiveIS"] = 0.2,
+                ["Knockback"] = 0,
+                ["MeleeAffliction"] = false,
+                ["HoldDownEnabled"] = false,
+                ["ExplosionCraterEnabled"] = true,
+                ["ShotgunPump"] = false,
+                ["MaxRotationSpeed"] = 360,
+                ["CrossScaleS"] = 0,
+                ["MuzzleFlashEnabled"] = true,
+                ["OverheatTime"] = 2.5,
+                ["Shockwave"] = true,
+                ["MeleeCriticalBaseChance"] = 5,
+                ["BloodWoundVisibleTime"] = 3,
+                ["WhizSoundVolume"] = 2.5,
+                ["ScopeSensitive"] = 0.25,
+                ["BulletShellVelocity"] = 17,
+                ["ChargingAnimationSpeed"] = 1,
+                ["HitCharSndVolume"] = 1,
+                ["MarkerEffectFadeTime"] = 1,
+                ["MeleeCriticalDamageMultiplier"] = 3,
+                ["MeleeAttackAnimationSpeed"] = 1,
+                ["ZeroDamageDistance"] = 10000,
+                ["AngleY_Max"] = 0,
+                ["ChargedShotEnabled"] = false,
+                ["HitCharSndIDs"] = {
+                    [1] = 3744371091,
+                    [2] = 3744371342,
+                    [3] = 3744371584,
+                    [4] = 4086201929,
+                    [5] = 4086201632,
+                    [6] = 4086202171
+                },
+                ["FullDamageDistance"] = 1000,
+                ["CrossDamper"] = 0.8,
+                ["ExplosionSoundPitchMax"] = 1.5,
+                ["LightColor"] = Color3.new(1, 1.1098039150238037, 0),
+                ["WhizSoundPitchMax"] = 1,
+                ["ShellScale"] = Vector3.new(1.5, 1.5, 1.5),
+                ["FireRates"] = {
+                    [1] = 0.125,
+                    [2] = 0.5,
+                    [3] = 0.5,
+                    [4] = 0.1
+                },
+                ["ChargingSoundPitchRange"] = {
+                    [1] = 1,
+                    [2] = 1.5
+                },
+                ["MeleeHeadshotDamageMultiplier"] = 2,
+                ["CriticalDamageMultiplier"] = 3,
+                ["ExplosiveEnabled"] = false,
+                ["SwitchTime"] = 0.25,
+                ["GoreSoundIDs"] = {
+                    [1] = 1930359546
+                },
+                ["BulletHoleEnabled"] = true,
+                ["AimFireAnimationSpeed"] = 1,
+                ["MeleeHitSoundVolume"] = 1,
+                ["Acceleration"] = Vector3.zero,
+                ["MeleeBloodWoundPartColor"] = true,
+                ["ScopeDelay"] = 0,
+                ["SecondaryFireAnimationEnabled"] = false,
+                ["InspectAnimationEnabled"] = false,
+                ["PartColor"] = true,
+                ["EchoEffect"] = true,
+                ["ProjectileType"] = "NewBullet",
+                ["FireModeTexts"] = {
+                    [1] = "SEMI-AUTO",
+                    [2] = "2-ROUND-BURST",
+                    [3] = "3-ROUND-BURST",
+                    [4] = "AUTO"
+                },
+                ["TacticalReloadTime"] = 3,
+                ["AimSecondaryFireAnimationSpeed"] = 1,
+                ["SecondaryFireAnimationSpeed"] = 1,
+                ["HitSoundPitchMax"] = 1.5,
+                ["HitSoundIDs"] = {
+                    [1] = 6962155378,
+                    [2] = 6962154691,
+                    [3] = 6962154691,
+                    [4] = 6962155018,
+                    [5] = 6962154328
+                },
+                ["ExplosionCraterVisibleTime"] = 3,
+                ["ExplosionKnockback"] = false,
+                ["HitSoundVolume"] = 1,
+                ["MinigunEnabled"] = false,
+                ["MeleeBloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                ["RaisePitch"] = false,
+                ["LightRange"] = 15,
+                ["Velocity"] = 50,
+                ["WalkSpeedRedutionEnabled"] = false,
+                ["AutoReload"] = true,
+                ["CameraRecoilingEnabled"] = true,
+                ["MaxDepletion"] = 4,
+                ["Keyboard"] = {
+                    ["HoldDown"] = Enum.KeyCode.E,
+                    ["Melee"] = Enum.KeyCode.H,
+                    ["Switch"] = Enum.KeyCode.V,
+                    ["Inspect"] = Enum.KeyCode.F,
+                    ["ToogleAim"] = Enum.KeyCode.Q,
+                    ["Reload"] = Enum.KeyCode.R
+                },
+                ["HitmarkerColorHS"] = Color3.new(1, 0, 0),
+                ["BloodEnabled"] = true,
+                ["ExplosionCraterSize"] = 3,
+                ["MarkerEffectSize"] = 0.5,
+                ["MaximumRate"] = 4,
+                ["DropYMin"] = -0.1,
+                ["DropAllRemainingBullets"] = false,
+                ["BulletPerShot"] = 8,
+                ["SecondaryShotgunPumpinAnimationSpeed"] = 1,
+                ["ExplosionSoundEnabled"] = true,
+                ["AdvancedChargingTime"] = 5,
+                ["Ejection"] = true,
+                ["YMin"] = -6,
+                ["MaxAmmo"] = 60,
+                ["ExplosionSoundVolume"] = 1,
+                ["TweenLength"] = 0.8,
+                ["GoreSoundPitchMax"] = 1.5,
+                ["AmmoPerMag"] = 12,
+                ["ShotgunPattern"] = false,
+                ["ExplosionSoundPitchMin"] = 1,
+                ["HitCharSndPitchMin"] = 1,
+                ["FullyGibbedLimbChance"] = 50,
+                ["PenetrationDepth"] = 0,
+                ["SelfKnockbackRedution"] = 0.8,
+                ["ScopeKnockbackDamper"] = 0.65,
+                ["PreShotgunReloadSpeed"] = 0.5,
+                ["AfflictChance"] = 100,
+                ["MeleeAfflictionName"] = "",
+                ["ChargingAnimationEnabled"] = false,
+                ["ShellClipinSpeed"] = 0.5,
+                ["MinigunRevUpAnimationSpeed"] = 1,
+                ["MinDepletion"] = 2,
+                ["WhizSoundID"] = {
+                    [1] = 342190012,
+                    [2] = 342190017,
+                    [3] = 342190024,
+                    [4] = 342190005
+                },
+                ["ExplosionCraterTexture"] = {
+                    [1] = 53875997
+                },
+                ["SpinY"] = 0,
+                ["SelfDamage"] = false,
+                ["Affliction"] = false,
+                ["MeleeBloodWoundVisibleTime"] = 3,
+                ["AngleZ_Min"] = -1,
+                ["SniperEnabled"] = false,
+                ["SecondaryShotgunPump"] = false,
+                ["BatteryEnabled"] = false,
+                ["ReloadTime"] = 3,
+                ["DamageBasedOnDistance"] = false,
+                ["DelayAfterFiring"] = 1,
+                ["HitmarkerEnabled"] = true,
+                ["CustomHitEffect"] = false,
+                ["SpinZ"] = 0,
+                ["BloodWoundTexture"] = {
+                    [1] = 195871208,
+                    [2] = 4117590991,
+                    [3] = 4117589687,
+                    [4] = 4117590335
+                },
+                ["SpinX"] = 3,
+                ["ChargingSoundIncreasePitch"] = true,
+                ["RecoilSpeed"] = 8,
+                ["LightShadows"] = true,
+                ["HitmarkerColor"] = Color3.new(1, 1, 1),
+                ["ExplosionCraterPartColor"] = false,
+                ["CooldownTime"] = 0.05,
+                ["BulletHoleSize"] = 0.5,
+                ["DamageDropOffEnabled"] = false,
+                ["ShellMeshID"] = 95392019,
+                ["HitmarkerSoundPitch"] = 1,
+                ["Spread"] = 0,
+                ["ScopeKnockbackSpeed"] = 15,
+                ["BaseDamage"] = 20,
+                ["AngleY_Min"] = 0,
+                ["Level2ChargingTime"] = 2,
+                ["CustomExplosion"] = false,
+                ["HitEffectEnabled"] = true,
+                ["LerpAlpha"] = 0.25,
+                ["ExplosionKnockbackPower"] = 50,
+                ["ReduceSelfDamageOnAirOnly"] = false,
+                ["ShotgunReload"] = false,
+                ["ExplosionKnockbackMultiplierOnTarget"] = 2,
+                ["MarkerEffectVisibleTime"] = 3,
+                ["MeleeAfflictChance"] = 100,
+                ["MeleeHitCharSndIDs"] = {
+                    [1] = 6398015798,
+                    [2] = 6398016125,
+                    [3] = 6398016391,
+                    [4] = 6398016618
+                },
+                ["LimitedAmmoEnabled"] = true,
+                ["SecondaryShotgunPumpinSpeed"] = 0.5,
+                ["RecoilDamper"] = 0.65,
+                ["FireAnimationSpeed"] = 1,
+                ["RemoveOldAtMax"] = false,
+                ["ChargedShotAdvanceEnabled"] = false,
+                ["EquippedAnimationSpeed"] = 1,
+                ["FireRate"] = 0.16,
+                ["Ammo"] = 60,
+                ["CooldownRate"] = 1,
+                ["ShotgunClipinAnimationSpeed"] = 1,
+                ["BloodWoundSize"] = 0.5,
+                ["SmokeTrailRateIncrement"] = 1,
+                ["ShellSize"] = Vector3.new(0.20000000298023224, 0.20000000298023224, 0.3199999928474426),
+                ["ChargeAlterTable"] = {},
+                ["PreShotgunReloadAnimationSpeed"] = 1,
+                ["MagCartridge"] = false,
+                ["AimChargingAnimationSpeed"] = 1,
+                ["FieldOfViewS"] = 12.5,
+                ["BloodWoundEnabled"] = true,
+                ["HeadshotDamageMultiplier"] = 2,
+                ["MeleeHitCharSndPitchMin"] = 1,
+                ["HitSoundPitchMin"] = 1,
+                ["HeatPerFireMin"] = 7,
+                ["Auto"] = false,
+                ["TacticalReloadAnimationEnabled"] = false,
+                ["BulletShellDelay"] = 0,
+                ["FireModes"] = {
+                    [1] = 1,
+                    [2] = 2,
+                    [3] = 3,
+                    [4] = true
+                },
+                ["MeleeHitCharSndVolume"] = 1,
+                ["MobileRecoil"] = {
+                    ["y"] = {
+                        [1] = 5,
+                        [2] = 6
+                    },
+                    ["x"] = {
+                        [1] = -1,
+                        [2] = 1
+                    },
+                    ["z"] = {
+                        [1] = -2,
+                        [2] = 2
+                    },
+                    ["speed"] = 20,
+                    ["damper"] = 0.55,
+                    ["recoilBackSize"] = 1.95
+                },
+                ["BulletShellEnabled"] = true,
+                ["HitmarkerFadeTimeHS"] = 0.4,
+                ["SelfDamageRedution"] = 0.5,
+                ["CrossSize"] = 7,
+                ["CrossSpeed"] = 15
+            },
+            [2] = GameService:GetService("Players").LocalPlayer.Character.HumanoidRootPart,
+            [3] = GameService:GetService("Players").LocalPlayer,
+            [4] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Humanoid"),
+            [5] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("HumanoidRootPart"),
+            [6] = {
+                [1] = 20,
+                [2] = 2,
+                [3] = true,
+                [4] = 12.616791725158691,
+                [5] = false,
+                [6] = 10000,
+                [7] = 1000
+            },
+            
+            [7] = {
+                [1] = 0,
+                [2] = 0,
+                [3] = false,
+                [4] = "",
+                [5] = 100
+            },
+            [8] = {
+                [1] = false,
+                [2] = 5,
+                [3] = 3
+            },
+            [9] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Torso"),
+            [10] = {
+                [1] = false,
+                [2] = {
+                    [1] = 1930359546
+                },
+                [3] = 1,
+                [4] = 1.5,
+                [5] = 1,
+                [6] = GameService:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("ItemInfo"):WaitForChild("AK47"):WaitForChild("GoreEffect"),
+                [7] = 50
+            }
+        }
+        
+        GameService:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("Remotes"):WaitForChild("InflictTarget"):InvokeServer(unpack(args))        
+    end
+})
+
+local UhhhRemoveBL = OP:CreateButton({
+    Name = "[🟢] Remove Warehouse Blacklist",
+    Callback = function()
+        local s, e = pcall(function()
+            workspace.GameStuff.PlayerStuff.Blacklists:ClearAllChildren()
+        end)
+
+        if s then
+            return notifications:Notify("[Blacklists]: Removed!")
+        end
+
+        notifications:Notify("[debug]: New error detected - " .. tostring(e))
+    end
+})
+
+local sus = OP:CreateButton({
+    Name = "[⚠️] sussy pos",
+    Callback = function()
+        local anim = game:GetService("ReplicatedStorage").GameStuff.Animations.Wakeup;
+        local a = workspace[Prox.Players.LocalPlayer.Name].Humanoid:LoadAnimation(anim)
+        a:Play()
+        a:AdjustSpeed(0)
+    end
+})
+
+local sus3 = OP:CreateButton({
+    Name = "[⚠️] remove sussy pos",
+    Callback = function()
+        local tracks = workspace[Prox.Players.LocalPlayer.Name].Humanoid:GetPlayingAnimationTracks()
+        for _, track in tracks do
+            if track.Name == "Wakeup" then
+                track:Stop()
+            end
+        end
+    end
+})
+
+local Invis = OP:CreateButton({
+    Name = "[🟢] Invisibility",
+    Callback = function()
+        local ChainThing = game:GetService("ReplicatedStorage").GameStuff.Animations.DespawnChain
+        local a = workspace[Prox.Players.LocalPlayer.Name].Humanoid:LoadAnimation(ChainThing)
+        a:Play()
+        task.wait(0.1)
+        a:AdjustSpeed(4)
+        task.wait(2)
+        a:AdjustSpeed(0)
+    end
+})
+
+local ReInvis = OP:CreateButton({
+    Name = "[🟢] Remove Invis",
+    Callback = function()
+        local tracks = workspace[Prox.Players.LocalPlayer.Name].Humanoid:GetPlayingAnimationTracks()
+        for _, track in tracks do
+            if track.Name == "DespawnChain" then
+                track:Stop()
+            end
+        end
+    end
+})
+
+local Blueprints = OP:CreateButton({
+    Name = "[🟢] Get Blueprints",
+    Callback = function()
+        local bs = game:GetService("Players").LocalPlayer.PlayerStats.Blueprints
+        local folderbro = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Workbench.MainFrame.Frame.Menu.Blueprints:GetChildren()
+        for _, thing in folderbro do
+            if thing:IsA("Frame") then
+                thing.Visible = true
+                notifications:Notify("[Blueprint]: Made " .. thing.Name .. " visible to True")
+            end
+        end
+
+        local attrbs = { 
+            "45ACP";
+            "CombatKnife";
+            "Deagle";
+            "DoubleBarrel";
+            "M1911";
+            "Machete";
+            "Shells";
+            "SpellBook"
+        }
+
+        for Index = 1, #attrbs do
+            bs:SetAttribute(attrbs[Index], true)
+            notifications:Notify(
+                string.format("[Blueprint]: Applied blueprint %s with value %s", 
+                attrbs[Index],
+                (bs:GetAttribute(attrbs[Index]) == true and 'Correct' or 'Incorrect')
+                )
+            )
+            task.wait()
+        end
+
+        notifications:Notify("[Blueprints]: Done? maybe")
+    end
+})
+
+local FixPower = OP:CreateButton({
+    Name = "[🟡] Fix Power",
+    Callback = function()
+        local function PowerSolver()
+            local Alert;
+            pcall(function()
+                Alert = workspace.GameStuff.GameSections.POWERSTATION.AlertUI
+            end)
+            if not Alert then
+                warn("[dbg]: Could not find alert")
+            end
+
+            local old = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame
+            local virtual_key_codes = {
+                A = 0x41, B = 0x42, C = 0x43, D = 0x44, E = 0x45,
+                F = 0x46, G = 0x47, H = 0x48, I = 0x49, J = 0x4A,
+                K = 0x4B, L = 0x4C, M = 0x4D, N = 0x4E, O = 0x4F,
+                P = 0x50, Q = 0x51, R = 0x52, S = 0x53, T = 0x54,
+                U = 0x55, V = 0x56, W = 0x57, X = 0x58, Y = 0x59,
+                Z = 0x5A,
+                ["0"] = 0x30, ["1"] = 0x31, ["2"] = 0x32, ["3"] = 0x33,
+                ["4"] = 0x34, ["5"] = 0x35, ["6"] = 0x36, ["7"] = 0x37,
+                ["8"] = 0x38, ["9"] = 0x39,
+            }
+            
+            
+            local function pressKey(key)
+                local upperedkey = string.upper(key)
+                local keycode = virtual_key_codes[upperedkey]
+            
+                if keycode then
+                    keypress(keycode)
+                    task.wait()
+                    keyrelease(keycode)
+                else
+                end
+            end
+
+            local function IsChainClose()
+                if not workspace.Misc.AI:FindFirstChildOfClass("Model") then
+                    return false
+                end
+
+                local dis = (
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.Position - 
+                    workspace.Misc.AI.CHAIN.HumanoidRootPart.Position
+                ).magnitude
+                dis = math.floor(dis);
+                return workspace.Misc.AI.CHAIN:GetAttribute("Alerted") == true and dis < 35
+            end
+            
+            local function CanClick()
+                local Alert;
+                pcall(function()
+                    Alert = workspace.GameStuff.GameSections.POWERSTATION.AlertUI
+                end)
+                if not Alert then
+                    notifications:Notify("[canclick]: AlertUI not existing")
+                    return false
+                end
+                return (Alert.GUI.Enabled == false and true or false)
+            end
+
+            local function _loadchunk()
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-206, -32, -103)
+                task.wait(0.1)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = true
+                task.wait(1.2)
+                game.Players.LocalPlayer.Character.HumanoidRootPart.Anchored = false
+            end
+
+            local function IsPowerOff()
+                _loadchunk()
+                if not workspace.GameStuff.GameSections.POWERSTATION.Lights:GetChildren()[4].Light:FindFirstChildWhichIsA("Part") then
+                    return false
+                end
+                local bool = workspace.GameStuff.GameSections.POWERSTATION.Lights:GetChildren()[4].Light:FindFirstChildWhichIsA("Part").PointLight.Enabled == false
+                return bool
+            end     
+            
+            local function FixPart()
+                local sigma
+                local success, err = pcall(function()
+                    local currentPrompt = workspace.GameStuff.GameSections.POWERSTATION.Hitbox.ProximityPrompt
+                    local key = tostring(currentPrompt.KeyboardKeyCode):gsub("Enum.KeyCode.", "")
+                    sigma = key;
+                end)
+            
+                if not success then
+                    return warn("Error getting key:", err)
+                end
+            
+                if CanClick() then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-206, -111, -126)
+                    pressKey(sigma)
+                end
+            end
+            
+            if IsPowerOff() then
+                notifications:Notify("[PowerSolver]: loading chunk")
+                _loadchunk()
+                notifications:Notify("[PowerSolver]: loaded chunk")
+                task.wait(0.3)
+                repeat
+                    FixPart()
+                    task.wait(0.095)
+                until workspace.GameStuff.GameSections.POWERSTATION.Values:GetAttribute("Progress") == workspace.GameStuff.GameSections.POWERSTATION.Values:GetAttribute("Max") or IsChainClose()
+                
+                if IsChainClose() then
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = old
+                    notifications:Notify("[PowerSolver]: CHAIN was close so power fixing was cancelled.")
+                end
+                notifications:Notify("[PowerSolver]: Fixed power")
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = old
+            else
+                notifications:Notify("[PowerSolver]: Power is already fixed")
+            end
+        end
+
+        task.spawn(PowerSolver);
+    end
+})
+
+local CrucifixBlatant = OP:CreateButton({
+    Name = "[🟢] Blatant Use Crucifix",
+    Callback = function()
+        if not debug.getupvalues or not getsenv then
+            notifications:Notify("[Blatant Use Crucifix]: You need both 'debug.getupvalues' and 'getsenv' for this to work.")
+            return; 
+        end;
+
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CTS' with " .. tostring(v))
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CHA' with " .. tostring(v))
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+        
+        -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----   
+                -----
+                -----
+                local k = CHA_keycode;
+                local function CrucifixSequence()
+                    if Dependencies.GetCurrentCharacter() and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix") and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix"):FindFirstChild("Handle")   then
+                        RRemote:FireServer("CrucifixEmit",nil,k)
+                        RRemote:FireServer("CrucifixSuccess",nil,k)
+                        RRemote:FireServer("CrucifixFinished",nil,k)
+                        local v12951285728734824242 = {
+                            [1] = Dependencies.GetCurrentCharacter().Crucifix.Handle.CFrame
+                        }
+                        RRemote:FireServer("CrucifixUsed", v12951285728734824242, k)
+                        notifications:Notify("[Blatant Use Crucifix]: Done! you can re-equip your crucifix to regenerate it.")
+                    else
+                        notifications:Notify("[Blatant Use Crucifix]: Hold/re-equip your crucifix")
+                        return;
+                    end
+                end 
+                task.spawn(CrucifixSequence)
+    end
+})
+
+local CrucifixBlatant2 = OP:CreateButton({
+    Name = "[🟢] Blatant Spam Use Crucifix",
+    Callback = function()
+        if not debug.getupvalues or not getsenv then
+            notifications:Notify("[Blatant Spam Use Crucifix]: You need both 'debug.getupvalues' and 'getsenv' for this to work.")
+            return;
+        end;
+
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CTS' with " .. tostring(v))
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CHA' with " .. tostring(v))
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+
+        local function Re_Init_Keycodes()
+            table.foreach({1,2},function(i)
+                ({GetCtsKeycode, GetChaKeycode})[i]()
+            end)
+            notifications:Notify("[...]: Refreshed CharacterMobility and CharacterHandler!")
+        end
+        
+        -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----   
+                -----
+                -----
+                local k = CHA_keycode;
+                local function CrucifixSequence()
+                    Re_Init_Keycodes()
+                    task.wait(0.025)
+                    k = CHA_keycode;
+                    if Dependencies.GetCurrentCharacter() and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix") and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix"):FindFirstChild("Handle")   then
+                        RRemote:FireServer("CrucifixEmit",nil,k)
+                        RRemote:FireServer("CrucifixSuccess",nil,k)
+                        RRemote:FireServer("CrucifixFinished",nil,k)
+                        local v12951285728734824242 = {
+                            [1] = Dependencies.GetCurrentCharacter().Crucifix.Handle.CFrame
+                        }
+                        RRemote:FireServer("CrucifixUsed", v12951285728734824242, k)
+                    else
+                        notifications:Notify("[Blatant Use Crucifix]: Hold/re-equip your crucifix")
+                        return;
+                    end
+                end 
+                for i=1,40 do
+                    coroutine.wrap(CrucifixSequence)()
+                    task.wait()
+                end
+    end
+})
+
+local B_Amount = 350
+
+local BlindnessLevel = OP:CreateSlider({
+    Name = "Blindness Amount",
+    Range = {0, 3500},
+    Increment = 1,
+    Suffix = "blindnesss",
+    CurrentValue = 10,
+    Flag = "blindness_amount",
+    Callback = function(Value)
+        B_Amount = tonumber(Value)
+    end,
+})
+
+local CrucifixBlatant2 = OP:CreateButton({
+    Name = "[🟢] Blindness Effect",
+    Callback = function()
+        if not debug.getupvalues or not getsenv then
+            notifications:Notify("[Blindness Effect]: You need both 'debug.getupvalues' and 'getsenv' for this to work.")
+            return;
+        end;
+
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+
+        local function Re_Init_Keycodes()
+            table.foreach({1,2},function(i)
+                ({GetCtsKeycode, GetChaKeycode})[i]()
+            end)
+        end
+        
+        -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----   
+                -----
+                -----
+                local k = CHA_keycode;
+                local function CrucifixSequence()
+                    Re_Init_Keycodes()
+                    task.wait(0.015)
+                    k = CHA_keycode;
+                    if Dependencies.GetCurrentCharacter() and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix") and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix"):FindFirstChild("Handle")   then
+                        RRemote:FireServer("CrucifixEmit",nil,k)
+                        RRemote:FireServer("CrucifixSuccess",nil,k)
+                        RRemote:FireServer("CrucifixFinished",nil,k)
+                        -- "[🟢] it works fine"
+                        -- "[🟢] sigma sigma boy"
+                        local v12951285728734824242 = {
+                            [1] = (
+                                Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix") and Dependencies.GetCurrentCharacter().Crucifix.Handle.CFrame
+                                or Dependencies.GetCurrentCharacter():FindFirstChild("HumanoidRootPart").CFrame
+                            )
+                        }
+                        RRemote:FireServer("CrucifixUsed", v12951285728734824242, k)
+                    else
+                        return;
+                    end
+                end 
+
+                for i=1,(B_Amount and tonumber(B_Amount) or 350) do
+                    coroutine.wrap(CrucifixSequence)()
+                    task.wait()
+                end
+    end
+})
+
+local Crucifix = OP:CreateButton({
+    Name = "[🟢] Legit Use Crucifix",
+    Callback = function()
+        if not debug.getupvalues or not getsenv then
+            notifications:Notify("[Use Crucifix]: You need both 'debug.getupvalues' and 'getsenv' for this to work.")
+            return;
+        end;
+
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CTS' with " .. tostring(v))
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                    notifications:Notify("[Addy]: Found 'CHA' with " .. tostring(v))
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+        
+        -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----
+                -----   
+                -----
+                -----
+                local k = CHA_keycode;
+                local function CrucifixSequence()
+                    if Dependencies.GetCurrentCharacter() and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix") and Dependencies.GetCurrentCharacter():FindFirstChild("Crucifix"):FindFirstChild("Handle")   then
+                        RRemote:FireServer("CrucifixBegin",nil,k)
+                        task.wait(1.2)
+                        RRemote:FireServer("CrucifixEmit",nil,k)
+                        RRemote:FireServer("CrucifixSuccess",nil,k)
+                        RRemote:FireServer("CrucifixFinished",nil,k)
+                        local v12951285728734824242 = {
+                            [1] = Dependencies.GetCurrentCharacter().Crucifix.Handle.CFrame
+                        }
+                        RRemote:FireServer("CrucifixUsed", v12951285728734824242, k)
+                        notifications:Notify("[Use Crucifix]: Done! you can re-equip your crucifix to regenerate it.")
+                    else
+                        notifications:Notify("[Use Crucifix]: Hold/re-equip your crucifix")
+                        return;
+                    end
+                end 
+                task.spawn(CrucifixSequence)
+    end
+})
+
+local SayMessage = Main:CreateInput({
+    Name = "Chat",
+    CurrentValue = "";
+    PlaceholderText = "Input";
+    RemoveTextAfterFocusLost = false;
+    Flag = "say-message-in-chat";
+    Callback = function(c)
+        if c ~= "_________________________________________" then
+            game:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("RadioChannel").Chat:FireServer(c)
+            return notifications:Notify("[Chat]: Sent message '"..tostring(c).."', if not sent, there is no power.")
+        end
+        notifications:Notify("[Chat]: nope i can't say it [remove/add 1 extra '_']")
+    end
+})
+
+local SpellbookFake = OP:CreateButton({
+    Name = "[🟢] Fake Spellbook",
+    Callback = function()
+        local function Everything()
+            local Inventory = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Inventory
+            local Img = "rbxassetid://15409902480"
+            local RE = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.MainUIHandler.Remote;
+            
+            local function Sell()
+                local args = {
+                    [1] = "Sell",
+                    [2] = "Radio"
+                }
+            
+                RE:FireServer(unpack(args))
+            end
+            
+            local function Buy()
+                local args = {
+                    [1] = "Buy",
+                    [2] = "Radio"
+                }
+            
+                RE:FireServer(unpack(args))
+            end
+            
+            local function MainThing()
+                for _, Child in Inventory:GetChildren() do
+                    if Child:IsA("ImageLabel") then
+                        if Child:FindFirstChild("Values") and Child:FindFirstChild("Icon") and Child:FindFirstChild("Icon").Image == Img then
+                            Child.Values.ItemName.Value = "SpellBook"
+                        end
+                    end
+                end
+            end
+            
+            function c()
+                Sell()
+                Buy()
+                task.wait(0.2)
+                MainThing()
+            end
+            
+            task.spawn(c)
+        end
+        
+        Everything()
+    end
+})
+
+local Loops = {}
+
+local AutoDodge = OP:CreateButton({
+    Name = "[🟢] Initialize Auto Dodge",
+    Callback = function()
+
+        if not getsenv or not debug.getupvalues then
+            return notifications:Notify("[AutoDodge]: Cannot work without 'debug.getupvalues' or 'getsenv'.")
+        end;
+
+        for _, Con in Loops do
+            notifications:Notify(string.format("[ignore-this-debug]: clearing %d; con %s", tostring(_), (tostring(Con) == "Connection" and "RBXScriptConnection" or "Unknown-Type?: "..tostring(Con))))
+            Con:Disconnect()
+        end
+
+        notifications:Notify(string.format("[ignore-this-debug]: amount %d; cleared %s", tostring(#Loops), (#Loops == 0 and tostring(true) or tostring(false))))
+        Loops[#Loops+1] = RunService.Heartbeat:Connect(function()
+            local Prox222 = setmetatable({}, {
+                __index = function(n, k)
+                    return game:GetService(k)
+                end
+            })
+            
+            local player = Prox222.Players.LocalPlayer
+            local character = player.Character or player.CharacterAdded:Wait()
+            
+            local cMobil = getsenv(character.CharacterMobility)
+            local cHandl = getsenv(character.CharacterHandler)
+            local CTS_keycode
+            local CHA_keycode
+            
+            local RRemote = character.CharacterHandler.Contents.Remotes.Interact
+            
+            local function IsKeycode(v)
+                if type(v) == "string" then
+                    return #v >= 20
+                end
+                return false
+            end
+            
+            local function GetCtsKeycode()
+                for n, v in pairs(debug.getupvalues(cMobil.DodgeFunc)) do
+                    if IsKeycode(v) then
+                        CTS_keycode = v
+                    end
+                end
+            end
+            
+            local function GetChaKeycode()
+                for n, v in pairs(debug.getupvalues(cHandl.MacheteParrying)) do
+                    if IsKeycode(v) then
+                        CHA_keycode = v
+                    end
+                end
+            end
+
+            GetCtsKeycode()
+            GetChaKeycode()
+            
+            if CTS_keycode then
+                local args = {
+                    [1] = "Dodge",
+                    [2] = CTS_keycode
+                }
+                character.CharacterMobility.CTS:FireServer(unpack(args))
+            end
+        end)
+    end
+})
+
+local ShootDoubleBarrel = Main:CreateButton({
+    Name = "[🟢] Shoot DB",
+    Callback = function()
+        local args = {
+            [1] = {
+                ["YMax"] = -5,
+                ["XMax"] = -2,
+                ["TacticalReloadAnimationSpeed"] = 1,
+                ["CanSpinPart"] = false,
+                ["AngleX_Min"] = 1,
+                ["Lifesteal"] = 0,
+                ["MeleeCriticalDamageEnabled"] = false,
+                ["SilenceEffect"] = false,
+                ["ExplosionCraterFadeTime"] = 1,
+                ["Accuracy"] = 0.2,
+                ["GoreSoundVolume"] = 1,
+                ["MeleeHitEffectEnabled"] = true,
+                ["DropVelocity"] = 10,
+                ["CustomMeleeHitEffect"] = false,
+                ["WhizDistance"] = 35,
+                ["ProjectileMotion"] = false,
+                ["WhizSoundPitchMin"] = 1,
+                ["ReloadAnimationSpeed"] = 1,
+                ["Gravity"] = Vector2.new(0, 1000),
+                ["SpreadRedutionS"] = 0.6,
+                ["VisibleTime"] = 0.01,
+                ["HoldDownAnimationSpeed"] = 0.5,
+                ["ScopeSwaySpeed"] = 15,
+                ["HoldingTime"] = 1,
+                ["HeatPerFireMax"] = 8,
+                ["MeleeBloodEnabled"] = true,
+                ["MeleeKnockback"] = 0,
+                ["MeleeDamage"] = 20,
+                ["MeleeBloodWoundTexture"] = {
+                    [1] = 2078626
+                },
+                ["EasingStyleNAD"] = Enum.EasingStyle.Quint,
+                ["ScopeKnockbackMultiplier"] = 5,
+                ["BulletHoleVisibleTime"] = 3,
+                ["AimIdleAnimationSpeed"] = 1,
+                ["MeleeHitSoundIDs"] = {
+                    [1] = 6000828622
+                },
+                ["PreShotgunReload"] = false,
+                ["BulletPerBurst"] = 3,
+                ["MeleeHitSoundPitchMin"] = 1,
+                ["ShotsForDepletion"] = 12,
+                ["HitmarkerSoundID"] = {
+                    [1] = 3748776946,
+                    [2] = 3748777642,
+                    [3] = 3748780065
+                },
+                ["MarkerEffectEnabled"] = true,
+                ["MuzzleLightEnabled"] = true,
+                ["DualEnabled"] = false,
+                ["RecoilRedution"] = 0.5,
+                ["EasingStyle"] = Enum.EasingStyle.Quint,
+                ["CrossExpansion"] = 100,
+                ["BloodWoundFadeTime"] = 1,
+                ["MeleeLifesteal"] = 0,
+                ["DisappearTime"] = 5,
+                ["ExplosionSoundIDs"] = {
+                    [1] = 163064102
+                },
+                ["BloodWoundPartColor"] = false,
+                ["MeleeHitSoundPitchMax"] = 1.5,
+                ["ExplosionKnockbackMultiplierOnPlayer"] = 2,
+                ["ADSLerpAlpha"] = 0.25,
+                ["PenetrationAmount"] = 0,
+                ["ShotgunPumpinSpeed"] = 0.5,
+                ["PenetrationType"] = "HumanoidPenetration",
+                ["DropXMax"] = 5,
+                ["HitmarkerSoundPitchHS"] = 1,
+                ["LowAmmo"] = true,
+                ["BulletShellRotVelocity"] = 40,
+                ["MeleeBloodWoundFadeTime"] = 1,
+                ["ADSCFrame"] = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+                ["EasingDirectionNAD"] = Enum.EasingDirection.Out,
+                ["MeleeBloodWoundSize"] = 0.5,
+                ["LightBrightness"] = 4,
+                ["HitmarkerFadeTime"] = 0.4,
+                ["SelfKnockbackMultiplier"] = 2,
+                ["BulletHoleFadeTime"] = 1,
+                ["MaximumTime"] = 1,
+                ["ChargingTime"] = 1,
+                ["InspectAnimationSpeed"] = 1,
+                ["BulletSpeed"] = 2400,
+                ["SelfKnockback"] = false,
+                ["MeleeHitCharSndPitchMax"] = 1,
+                ["CrossScaleIS"] = 0.6,
+                ["IronsightEnabled"] = true,
+                ["SpreadPattern"] = {
+                    [1] = {
+                        [1] = 0,
+                        [2] = -0.4
+                    },
+                    [2] = {
+                        [1] = -0.35,
+                        [2] = 0.2
+                    },
+                    [3] = {
+                        [1] = 0.35,
+                        [2] = 0.2
+                    },
+                    [4] = {
+                        [1] = 0,
+                        [2] = 1
+                    },
+                    [5] = {
+                        [1] = 0.95,
+                        [2] = 0.31
+                    },
+                    [6] = {
+                        [1] = 0.59,
+                        [2] = -0.81
+                    },
+                    [7] = {
+                        [1] = -0.59,
+                        [2] = -0.81
+                    },
+                    [8] = {
+                        [1] = -0.95,
+                        [2] = 0.31
+                    }
+                },
+                ["SmokeTrailEnabled"] = false,
+                ["MeleeAttackEnabled"] = false,
+                ["HeadshotEnabled"] = true,
+                ["WalkSpeedRedution"] = 6,
+                ["AngleZ_Max"] = 1,
+                ["MinigunRevDownAnimationSpeed"] = 1,
+                ["FirstPersonArms"] = false,
+                ["FieldOfViewIS"] = 50,
+                ["IdleAnimationSpeed"] = 1,
+                ["DelayBeforeFiring"] = 1,
+                ["ScopeSwayDamper"] = 0.65,
+                ["SpreadRedutionIS"] = 0.6,
+                ["TimeBeforeCooldown"] = 3,
+                ["MouseSensitiveS"] = 0.2,
+                ["Controller"] = {
+                    ["HoldDown"] = Enum.KeyCode.DPadUp,
+                    ["Melee"] = Enum.KeyCode.ButtonR3,
+                    ["Inspect"] = Enum.KeyCode.DPadDown,
+                    ["Switch"] = Enum.KeyCode.DPadRight,
+                    ["Fire"] = Enum.KeyCode.ButtonR1,
+                    ["ToogleAim"] = Enum.KeyCode.ButtonL1,
+                    ["Reload"] = Enum.KeyCode.ButtonX
+                },
+                ["SelfKnockbackPower"] = 50,
+                ["EquipTime"] = 0,
+                ["BurstFireEnabled"] = false,
+                ["XMin"] = -4,
+                ["MarkerPartColor"] = true,
+                ["MarkerEffectTexture"] = {
+                    [1] = 2078626
+                },
+                ["BloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                ["TweenLengthNAD"] = 0.8,
+                ["Drag"] = 1,
+                ["MaxCount"] = 200,
+                ["CriticalBaseChance"] = 5,
+                ["GoreSoundPitchMin"] = 1,
+                ["MeleeBloodWoundEnabled"] = true,
+                ["GoreEffectEnabled"] = false,
+                ["OverheatAnimationSpeed"] = 1,
+                ["BurstRate"] = 0.075,
+                ["ShellTextureID"] = 95391833,
+                ["BulletHoleTexture"] = {
+                    [1] = 4784905666,
+                    [2] = 4784881970
+                },
+                ["AimAnimationsEnabled"] = false,
+                ["Recoil"] = 230,
+                ["MeleeAttackRange"] = 4,
+                ["HitCharSndPitchMax"] = 1,
+                ["Range"] = 5000,
+                ["MaxHeat"] = 100,
+                ["FirstPersonArmADS"] = false,
+                ["DropYMax"] = 0,
+                ["ExplosionRadius"] = 8,
+                ["DropXMin"] = -5,
+                ["AfflictionName"] = "",
+                ["BulletShellParticles"] = false,
+                ["ShotgunPumpinAnimationSpeed"] = 1,
+                ["BurstRates"] = {
+                    [1] = 0,
+                    [2] = 0.075,
+                    [3] = 0.075,
+                    [4] = 0
+                },
+                ["MeleeHeadshotEnabled"] = true,
+                ["WhizSoundEnabled"] = true,
+                ["HoldAndReleaseEnabled"] = false,
+                ["AngleX_Max"] = 1,
+                ["Level1ChargingTime"] = 1,
+                ["SelectiveFireEnabled"] = false,
+                ["CriticalDamageEnabled"] = false,
+                ["AllowCollide"] = false,
+                ["SwitchAnimationSpeed"] = 1,
+                ["ShotgunEnabled"] = true,
+                ["EasingDirection"] = Enum.EasingDirection.Out,
+                ["MouseSensitiveIS"] = 0.2,
+                ["Knockback"] = 0,
+                ["MeleeAffliction"] = false,
+                ["HoldDownEnabled"] = false,
+                ["ExplosionCraterEnabled"] = true,
+                ["ShotgunPump"] = false,
+                ["MaxRotationSpeed"] = 360,
+                ["CrossScaleS"] = 0,
+                ["MuzzleFlashEnabled"] = true,
+                ["OverheatTime"] = 2.5,
+                ["Shockwave"] = true,
+                ["MeleeCriticalBaseChance"] = 5,
+                ["BloodWoundVisibleTime"] = 3,
+                ["WhizSoundVolume"] = 2.5,
+                ["ScopeSensitive"] = 0.25,
+                ["BulletShellVelocity"] = 17,
+                ["ChargingAnimationSpeed"] = 1,
+                ["HitCharSndVolume"] = 1,
+                ["MarkerEffectFadeTime"] = 1,
+                ["MeleeCriticalDamageMultiplier"] = 3,
+                ["MeleeAttackAnimationSpeed"] = 1,
+                ["ZeroDamageDistance"] = 10000,
+                ["AngleY_Max"] = 0,
+                ["RemoveOldAtMax"] = false,
+                ["HitCharSndIDs"] = {
+                    [1] = 3744371091,
+                    [2] = 3744371342,
+                    [3] = 3744371584,
+                    [4] = 4086201929,
+                    [5] = 4086201632,
+                    [6] = 4086202171
+                },
+                ["FullDamageDistance"] = 1000,
+                ["CrossDamper"] = 0.8,
+                ["ExplosionSoundPitchMax"] = 1.5,
+                ["LightColor"] = Color3.new(1, 1.1098039150238037, 0),
+                ["WhizSoundPitchMax"] = 1,
+                ["ShellScale"] = Vector3.new(1.5, 1.5, 1.5),
+                ["FireRates"] = {
+                    [1] = 0.125,
+                    [2] = 0.5,
+                    [3] = 0.5,
+                    [4] = 0.1
+                },
+                ["ChargingSoundPitchRange"] = {
+                    [1] = 1,
+                    [2] = 1.5
+                },
+                ["MeleeHeadshotDamageMultiplier"] = 2,
+                ["CriticalDamageMultiplier"] = 3,
+                ["ExplosiveEnabled"] = false,
+                ["SwitchTime"] = 0.25,
+                ["BulletHoleEnabled"] = true,
+                ["HitmarkerFadeTimeHS"] = 0.4,
+                ["AimFireAnimationSpeed"] = 1,
+                ["MeleeHitSoundVolume"] = 1,
+                ["Acceleration"] = Vector3.zero,
+                ["ScopeDelay"] = 0,
+                ["SecondaryFireAnimationEnabled"] = false,
+                ["InspectAnimationEnabled"] = false,
+                ["PartColor"] = true,
+                ["MeleeBloodWoundPartColor"] = true,
+                ["EchoEffect"] = true,
+                ["Auto"] = false,
+                ["TacticalReloadTime"] = 3,
+                ["FireModeTexts"] = {
+                    [1] = "SEMI-AUTO",
+                    [2] = "2-ROUND-BURST",
+                    [3] = "3-ROUND-BURST",
+                    [4] = "AUTO"
+                },
+                ["SecondaryFireAnimationSpeed"] = 1,
+                ["AimSecondaryFireAnimationSpeed"] = 1,
+                ["HitSoundIDs"] = {
+                    [1] = 6962155378,
+                    [2] = 6962154691,
+                    [3] = 6962154691,
+                    [4] = 6962155018,
+                    [5] = 6962154328
+                },
+                ["Ammo"] = 60,
+                ["ExplosionKnockback"] = false,
+                ["HitSoundVolume"] = 1,
+                ["HitSoundPitchMax"] = 1.5,
+                ["MinigunEnabled"] = false,
+                ["RaisePitch"] = false,
+                ["Velocity"] = 50,
+                ["FieldOfViewS"] = 12.5,
+                ["ExplosionCraterVisibleTime"] = 3,
+                ["WalkSpeedRedutionEnabled"] = false,
+                ["CameraRecoilingEnabled"] = true,
+                ["MaxDepletion"] = 4,
+                ["PreShotgunReloadAnimationSpeed"] = 1,
+                ["Keyboard"] = {
+                    ["HoldDown"] = Enum.KeyCode.E,
+                    ["Melee"] = Enum.KeyCode.H,
+                    ["Switch"] = Enum.KeyCode.V,
+                    ["Inspect"] = Enum.KeyCode.F,
+                    ["ToogleAim"] = Enum.KeyCode.Q,
+                    ["Reload"] = Enum.KeyCode.R
+                },
+                ["ShellSize"] = Vector3.new(0.20000000298023224, 0.20000000298023224, 0.3199999928474426),
+                ["ExplosionCraterSize"] = 3,
+                ["BloodEnabled"] = true,
+                ["ReduceSelfDamageOnAirOnly"] = false,
+                ["ShotgunClipinAnimationSpeed"] = 1,
+                ["DropYMin"] = -0.1,
+                ["DropAllRemainingBullets"] = false,
+                ["BulletPerShot"] = 9,
+                ["SecondaryShotgunPumpinAnimationSpeed"] = 1,
+                ["AdvancedChargingTime"] = 5,
+                ["Ejection"] = true,
+                ["ExplosionSoundVolume"] = 1,
+                ["YMin"] = -6,
+                ["MaxAmmo"] = 60,
+                ["MarkerEffectVisibleTime"] = 3,
+                ["GoreSoundPitchMax"] = 1.5,
+                ["TweenLength"] = 0.8,
+                ["ShotgunPattern"] = false,
+                ["MeleeHitCharSndIDs"] = {
+                    [1] = 6398015798,
+                    [2] = 6398016125,
+                    [3] = 6398016391,
+                    [4] = 6398016618
+                },
+                ["FullyGibbedLimbChance"] = 50,
+                ["HitCharSndPitchMin"] = 1,
+                ["PenetrationDepth"] = 0,
+                ["ExplosionKnockbackMultiplierOnTarget"] = 2,
+                ["ScopeKnockbackDamper"] = 0.65,
+                ["SelfKnockbackRedution"] = 0.8,
+                ["ShellClipinSpeed"] = 0.5,
+                ["MeleeAfflictionName"] = "",
+                ["ChargingAnimationEnabled"] = false,
+                ["PreShotgunReloadSpeed"] = 0.5,
+                ["MinigunRevUpAnimationSpeed"] = 1,
+                ["AfflictChance"] = 100,
+                ["WhizSoundID"] = {
+                    [1] = 342190012,
+                    [2] = 342190017,
+                    [3] = 342190024,
+                    [4] = 342190005
+                },
+                ["CustomExplosion"] = false,
+                ["HitEffectEnabled"] = true,
+                ["ExplosionSoundEnabled"] = true,
+                ["Affliction"] = false,
+                ["SpinZ"] = 0,
+                ["BaseDamage"] = 20,
+                ["AngleZ_Min"] = -1,
+                ["SecondaryShotgunPump"] = false,
+                ["CooldownRate"] = 1,
+                ["ReloadTime"] = 3,
+                ["SniperEnabled"] = false,
+                ["BatteryEnabled"] = false,
+                ["HitmarkerEnabled"] = true,
+                ["CustomHitEffect"] = false,
+                ["DelayAfterFiring"] = 1,
+                ["BloodWoundTexture"] = {
+                    [1] = 195871208,
+                    [2] = 4117590991,
+                    [3] = 4117589687,
+                    [4] = 4117590335
+                },
+                ["SpinY"] = 0,
+                ["SpinX"] = 3,
+                ["RecoilSpeed"] = 8,
+                ["LightShadows"] = true,
+                ["HitmarkerColor"] = Color3.new(1, 1, 1),
+                ["ExplosionCraterPartColor"] = false,
+                ["CooldownTime"] = 0.05,
+                ["BulletHoleSize"] = 0.7,
+                ["GoreSoundIDs"] = {
+                    [1] = 1930359546
+                },
+                ["ChargingSoundIncreasePitch"] = true,
+                ["DamageDropOffEnabled"] = false,
+                ["HitmarkerSoundPitch"] = 1,
+                ["Spread"] = 30,
+                ["ScopeKnockbackSpeed"] = 15,
+                ["AngleY_Min"] = 0,
+                ["Level2ChargingTime"] = 2,
+                ["ShellMeshID"] = 95392019,
+                ["MeleeBloodWoundVisibleTime"] = 3,
+                ["LerpAlpha"] = 0.25,
+                ["ExplosionKnockbackPower"] = 50,
+                ["ExplosionCraterTexture"] = {
+                    [1] = 53875997
+                },
+                ["MinDepletion"] = 2,
+                ["ShotgunReload"] = false,
+                ["MarkerEffectSize"] = 0.5,
+                ["MeleeAfflictChance"] = 100,
+                ["DamageBasedOnDistance"] = false,
+                ["LimitedAmmoEnabled"] = true,
+                ["SecondaryShotgunPumpinSpeed"] = 0.5,
+                ["RecoilDamper"] = 0.8,
+                ["FireAnimationSpeed"] = 1,
+                ["AmmoPerMag"] = 12,
+                ["ExplosionSoundPitchMin"] = 1,
+                ["EquippedAnimationSpeed"] = 1,
+                ["ChargedShotAdvanceEnabled"] = false,
+                ["FireRate"] = 0.45,
+                ["ChargedShotEnabled"] = false,
+                ["HeatPerFireMin"] = 7,
+                ["BloodWoundSize"] = 0.5,
+                ["MaximumRate"] = 4,
+                ["SmokeTrailRateIncrement"] = 1,
+                ["ChargeAlterTable"] = {},
+                ["HitmarkerColorHS"] = Color3.new(1, 0, 0),
+                ["MagCartridge"] = false,
+                ["AimChargingAnimationSpeed"] = 1,
+                ["AutoReload"] = true,
+                ["BloodWoundEnabled"] = true,
+                ["HeadshotDamageMultiplier"] = 2,
+                ["MeleeHitCharSndPitchMin"] = 1,
+                ["MeleeHitCharSndVolume"] = 1,
+                ["TacticalReloadAnimationEnabled"] = false,
+                ["HitSoundPitchMin"] = 1,
+                ["MeleeBloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                ["BulletShellDelay"] = 0,
+                ["SelfDamage"] = false,
+                ["ProjectileType"] = "NewBullet",
+                ["FireModes"] = {
+                    [1] = 1,
+                    [2] = 2,
+                    [3] = 3,
+                    [4] = true
+                },
+                ["BulletShellEnabled"] = true,
+                ["LightRange"] = 15,
+                ["SelfDamageRedution"] = 0.5,
+                ["CrossSize"] = 7,
+                ["CrossSpeed"] = 15
+            },
+            [2] = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart,
+            [3] = game:GetService("Players").LocalPlayer,
+            [4] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Humanoid"),
+            [5] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("HumanoidRootPart"),
+            [6] = {
+                [1] = 20,
+                [2] = 2,
+                [3] = true,
+                [4] = 23.148372650146484,
+                [5] = false,
+                [6] = 10000,
+                [7] = 1000
+            },
+            [7] = {
+                [1] = 0,
+                [2] = 0,
+                [3] = false,
+                [4] = "",
+                [5] = 100
+            },
+            [8] = {
+                [1] = false,
+                [2] = 5,
+                [3] = 3
+            },
+            [9] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Left Leg"),
+            [10] = {
+                [1] = false,
+                [2] = {
+                    [1] = 1930359546
+                },
+                [3] = 1,
+                [4] = 1.5,
+                [5] = 1,
+                [6] = game:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("ItemInfo"):WaitForChild("DoubleBarrel"):WaitForChild("GoreEffect"),
+                [7] = 50
+            }
+        }
+        
+        game:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("Remotes"):WaitForChild("InflictTarget"):InvokeServer(unpack(args))        
+    end
+})
+
+local DBInstaBmTHING = Main:CreateButton({
+    Name = "[🟢] Insta Blood Moon [Requires DB]",
+    Callback = function()
+        function Main()
+            local args = {
+                        [1] = {
+                            ["YMax"] = -5,
+                            ["XMax"] = -2,
+                            ["TacticalReloadAnimationSpeed"] = 1,
+                            ["CanSpinPart"] = false,
+                            ["AngleX_Min"] = 1,
+                            ["Lifesteal"] = 0,
+                            ["MeleeCriticalDamageEnabled"] = false,
+                            ["SilenceEffect"] = false,
+                            ["ExplosionCraterFadeTime"] = 1,
+                            ["Accuracy"] = 0.2,
+                            ["GoreSoundVolume"] = 1,
+                            ["MeleeHitEffectEnabled"] = true,
+                            ["DropVelocity"] = 10,
+                            ["CustomMeleeHitEffect"] = false,
+                            ["WhizDistance"] = 35,
+                            ["ProjectileMotion"] = false,
+                            ["WhizSoundPitchMin"] = 1,
+                            ["ReloadAnimationSpeed"] = 1,
+                            ["Gravity"] = Vector2.new(0, 1000),
+                            ["SpreadRedutionS"] = 0.6,
+                            ["VisibleTime"] = 0.01,
+                            ["HoldDownAnimationSpeed"] = 0.5,
+                            ["ScopeSwaySpeed"] = 15,
+                            ["HoldingTime"] = 1,
+                            ["HeatPerFireMax"] = 8,
+                            ["MeleeBloodEnabled"] = true,
+                            ["MeleeKnockback"] = 0,
+                            ["MeleeDamage"] = 20,
+                            ["MeleeBloodWoundTexture"] = {
+                                [1] = 2078626
+                            },
+                            ["EasingStyleNAD"] = Enum.EasingStyle.Quint,
+                            ["ScopeKnockbackMultiplier"] = 5,
+                            ["BulletHoleVisibleTime"] = 3,
+                            ["AimIdleAnimationSpeed"] = 1,
+                            ["MeleeHitSoundIDs"] = {
+                                [1] = 6000828622
+                            },
+                            ["PreShotgunReload"] = false,
+                            ["BulletPerBurst"] = 3,
+                            ["MeleeHitSoundPitchMin"] = 1,
+                            ["ShotsForDepletion"] = 12,
+                            ["HitmarkerSoundID"] = {
+                                [1] = 3748776946,
+                                [2] = 3748777642,
+                                [3] = 3748780065
+                            },
+                            ["MarkerEffectEnabled"] = true,
+                            ["MuzzleLightEnabled"] = true,
+                            ["DualEnabled"] = false,
+                            ["RecoilRedution"] = 0.5,
+                            ["EasingStyle"] = Enum.EasingStyle.Quint,
+                            ["CrossExpansion"] = 100,
+                            ["BloodWoundFadeTime"] = 1,
+                            ["MeleeLifesteal"] = 0,
+                            ["DisappearTime"] = 5,
+                            ["ExplosionSoundIDs"] = {
+                                [1] = 163064102
+                            },
+                            ["BloodWoundPartColor"] = false,
+                            ["MeleeHitSoundPitchMax"] = 1.5,
+                            ["ExplosionKnockbackMultiplierOnPlayer"] = 2,
+                            ["ADSLerpAlpha"] = 0.25,
+                            ["PenetrationAmount"] = 0,
+                            ["ShotgunPumpinSpeed"] = 0.5,
+                            ["PenetrationType"] = "HumanoidPenetration",
+                            ["DropXMax"] = 5,
+                            ["HitmarkerSoundPitchHS"] = 1,
+                            ["LowAmmo"] = true,
+                            ["BulletShellRotVelocity"] = 40,
+                            ["MeleeBloodWoundFadeTime"] = 1,
+                            ["ADSCFrame"] = CFrame.new(0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1),
+                            ["EasingDirectionNAD"] = Enum.EasingDirection.Out,
+                            ["MeleeBloodWoundSize"] = 0.5,
+                            ["LightBrightness"] = 4,
+                            ["HitmarkerFadeTime"] = 0.4,
+                            ["SelfKnockbackMultiplier"] = 2,
+                            ["BulletHoleFadeTime"] = 1,
+                            ["MaximumTime"] = 1,
+                            ["ChargingTime"] = 1,
+                            ["InspectAnimationSpeed"] = 1,
+                            ["BulletSpeed"] = 2400,
+                            ["SelfKnockback"] = false,
+                            ["MeleeHitCharSndPitchMax"] = 1,
+                            ["CrossScaleIS"] = 0.6,
+                            ["IronsightEnabled"] = true,
+                            ["SpreadPattern"] = {
+                                [1] = {
+                                    [1] = 0,
+                                    [2] = -0.4
+                                },
+                                [2] = {
+                                    [1] = -0.35,
+                                    [2] = 0.2
+                                },
+                                [3] = {
+                                    [1] = 0.35,
+                                    [2] = 0.2
+                                },
+                                [4] = {
+                                    [1] = 0,
+                                    [2] = 1
+                                },
+                                [5] = {
+                                    [1] = 0.95,
+                                    [2] = 0.31
+                                },
+                                [6] = {
+                                    [1] = 0.59,
+                                    [2] = -0.81
+                                },
+                                [7] = {
+                                    [1] = -0.59,
+                                    [2] = -0.81
+                                },
+                                [8] = {
+                                    [1] = -0.95,
+                                    [2] = 0.31
+                                }
+                            },
+                            ["SmokeTrailEnabled"] = false,
+                            ["MeleeAttackEnabled"] = false,
+                            ["HeadshotEnabled"] = true,
+                            ["WalkSpeedRedution"] = 6,
+                            ["AngleZ_Max"] = 1,
+                            ["MinigunRevDownAnimationSpeed"] = 1,
+                            ["FirstPersonArms"] = false,
+                            ["FieldOfViewIS"] = 50,
+                            ["IdleAnimationSpeed"] = 1,
+                            ["DelayBeforeFiring"] = 1,
+                            ["ScopeSwayDamper"] = 0.65,
+                            ["SpreadRedutionIS"] = 0.6,
+                            ["TimeBeforeCooldown"] = 3,
+                            ["MouseSensitiveS"] = 0.2,
+                            ["Controller"] = {
+                                ["HoldDown"] = Enum.KeyCode.DPadUp,
+                                ["Melee"] = Enum.KeyCode.ButtonR3,
+                                ["Inspect"] = Enum.KeyCode.DPadDown,
+                                ["Switch"] = Enum.KeyCode.DPadRight,
+                                ["Fire"] = Enum.KeyCode.ButtonR1,
+                                ["ToogleAim"] = Enum.KeyCode.ButtonL1,
+                                ["Reload"] = Enum.KeyCode.ButtonX
+                            },
+                            ["SelfKnockbackPower"] = 50,
+                            ["EquipTime"] = 0,
+                            ["BurstFireEnabled"] = false,
+                            ["XMin"] = -4,
+                            ["MarkerPartColor"] = true,
+                            ["MarkerEffectTexture"] = {
+                                [1] = 2078626
+                            },
+                            ["BloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                            ["TweenLengthNAD"] = 0.8,
+                            ["Drag"] = 1,
+                            ["MaxCount"] = 200,
+                            ["CriticalBaseChance"] = 5,
+                            ["GoreSoundPitchMin"] = 1,
+                            ["MeleeBloodWoundEnabled"] = true,
+                            ["GoreEffectEnabled"] = false,
+                            ["OverheatAnimationSpeed"] = 1,
+                            ["BurstRate"] = 0.075,
+                            ["ShellTextureID"] = 95391833,
+                            ["BulletHoleTexture"] = {
+                                [1] = 4784905666,
+                                [2] = 4784881970
+                            },
+                            ["AimAnimationsEnabled"] = false,
+                            ["Recoil"] = 230,
+                            ["MeleeAttackRange"] = 4,
+                            ["HitCharSndPitchMax"] = 1,
+                            ["Range"] = 5000,
+                            ["MaxHeat"] = 100,
+                            ["FirstPersonArmADS"] = false,
+                            ["DropYMax"] = 0,
+                            ["ExplosionRadius"] = 8,
+                            ["DropXMin"] = -5,
+                            ["AfflictionName"] = "",
+                            ["BulletShellParticles"] = false,
+                            ["ShotgunPumpinAnimationSpeed"] = 1,
+                            ["BurstRates"] = {
+                                [1] = 0,
+                                [2] = 0.075,
+                                [3] = 0.075,
+                                [4] = 0
+                            },
+                            ["MeleeHeadshotEnabled"] = true,
+                            ["WhizSoundEnabled"] = true,
+                            ["HoldAndReleaseEnabled"] = false,
+                            ["AngleX_Max"] = 1,
+                            ["Level1ChargingTime"] = 1,
+                            ["SelectiveFireEnabled"] = false,
+                            ["CriticalDamageEnabled"] = false,
+                            ["AllowCollide"] = false,
+                            ["SwitchAnimationSpeed"] = 1,
+                            ["ShotgunEnabled"] = true,
+                            ["EasingDirection"] = Enum.EasingDirection.Out,
+                            ["MouseSensitiveIS"] = 0.2,
+                            ["Knockback"] = 0,
+                            ["MeleeAffliction"] = false,
+                            ["HoldDownEnabled"] = false,
+                            ["ExplosionCraterEnabled"] = true,
+                            ["ShotgunPump"] = false,
+                            ["MaxRotationSpeed"] = 360,
+                            ["CrossScaleS"] = 0,
+                            ["MuzzleFlashEnabled"] = true,
+                            ["OverheatTime"] = 2.5,
+                            ["Shockwave"] = true,
+                            ["MeleeCriticalBaseChance"] = 5,
+                            ["BloodWoundVisibleTime"] = 3,
+                            ["WhizSoundVolume"] = 2.5,
+                            ["ScopeSensitive"] = 0.25,
+                            ["BulletShellVelocity"] = 17,
+                            ["ChargingAnimationSpeed"] = 1,
+                            ["HitCharSndVolume"] = 1,
+                            ["MarkerEffectFadeTime"] = 1,
+                            ["MeleeCriticalDamageMultiplier"] = 3,
+                            ["MeleeAttackAnimationSpeed"] = 1,
+                            ["ZeroDamageDistance"] = 10000,
+                            ["AngleY_Max"] = 0,
+                            ["RemoveOldAtMax"] = false,
+                            ["HitCharSndIDs"] = {
+                                [1] = 3744371091,
+                                [2] = 3744371342,
+                                [3] = 3744371584,
+                                [4] = 4086201929,
+                                [5] = 4086201632,
+                                [6] = 4086202171
+                            },
+                            ["FullDamageDistance"] = 1000,
+                            ["CrossDamper"] = 0.8,
+                            ["ExplosionSoundPitchMax"] = 1.5,
+                            ["LightColor"] = Color3.new(1, 1.1098039150238037, 0),
+                            ["WhizSoundPitchMax"] = 1,
+                            ["ShellScale"] = Vector3.new(1.5, 1.5, 1.5),
+                            ["FireRates"] = {
+                                [1] = 0.125,
+                                [2] = 0.5,
+                                [3] = 0.5,
+                                [4] = 0.1
+                            },
+                            ["ChargingSoundPitchRange"] = {
+                                [1] = 1,
+                                [2] = 1.5
+                            },
+                            ["MeleeHeadshotDamageMultiplier"] = 2,
+                            ["CriticalDamageMultiplier"] = 3,
+                            ["ExplosiveEnabled"] = false,
+                            ["SwitchTime"] = 0.25,
+                            ["BulletHoleEnabled"] = true,
+                            ["HitmarkerFadeTimeHS"] = 0.4,
+                            ["AimFireAnimationSpeed"] = 1,
+                            ["MeleeHitSoundVolume"] = 1,
+                            ["Acceleration"] = Vector3.zero,
+                            ["ScopeDelay"] = 0,
+                            ["SecondaryFireAnimationEnabled"] = false,
+                            ["InspectAnimationEnabled"] = false,
+                            ["PartColor"] = true,
+                            ["MeleeBloodWoundPartColor"] = true,
+                            ["EchoEffect"] = true,
+                            ["Auto"] = false,
+                            ["TacticalReloadTime"] = 3,
+                            ["FireModeTexts"] = {
+                                [1] = "SEMI-AUTO",
+                                [2] = "2-ROUND-BURST",
+                                [3] = "3-ROUND-BURST",
+                                [4] = "AUTO"
+                            },
+                            ["SecondaryFireAnimationSpeed"] = 1,
+                            ["AimSecondaryFireAnimationSpeed"] = 1,
+                            ["HitSoundIDs"] = {
+                                [1] = 6962155378,
+                                [2] = 6962154691,
+                                [3] = 6962154691,
+                                [4] = 6962155018,
+                                [5] = 6962154328
+                            },
+                            ["Ammo"] = 60,
+                            ["ExplosionKnockback"] = false,
+                            ["HitSoundVolume"] = 1,
+                            ["HitSoundPitchMax"] = 1.5,
+                            ["MinigunEnabled"] = false,
+                            ["RaisePitch"] = false,
+                            ["Velocity"] = 50,
+                            ["FieldOfViewS"] = 12.5,
+                            ["ExplosionCraterVisibleTime"] = 3,
+                            ["WalkSpeedRedutionEnabled"] = false,
+                            ["CameraRecoilingEnabled"] = true,
+                            ["MaxDepletion"] = 4,
+                            ["PreShotgunReloadAnimationSpeed"] = 1,
+                            ["Keyboard"] = {
+                                ["HoldDown"] = Enum.KeyCode.E,
+                                ["Melee"] = Enum.KeyCode.H,
+                                ["Switch"] = Enum.KeyCode.V,
+                                ["Inspect"] = Enum.KeyCode.F,
+                                ["ToogleAim"] = Enum.KeyCode.Q,
+                                ["Reload"] = Enum.KeyCode.R
+                            },
+                            ["ShellSize"] = Vector3.new(0.20000000298023224, 0.20000000298023224, 0.3199999928474426),
+                            ["ExplosionCraterSize"] = 3,
+                            ["BloodEnabled"] = true,
+                            ["ReduceSelfDamageOnAirOnly"] = false,
+                            ["ShotgunClipinAnimationSpeed"] = 1,
+                            ["DropYMin"] = -0.1,
+                            ["DropAllRemainingBullets"] = false,
+                            ["BulletPerShot"] = 9,
+                            ["SecondaryShotgunPumpinAnimationSpeed"] = 1,
+                            ["AdvancedChargingTime"] = 5,
+                            ["Ejection"] = true,
+                            ["ExplosionSoundVolume"] = 1,
+                            ["YMin"] = -6,
+                            ["MaxAmmo"] = 60,
+                            ["MarkerEffectVisibleTime"] = 3,
+                            ["GoreSoundPitchMax"] = 1.5,
+                            ["TweenLength"] = 0.8,
+                            ["ShotgunPattern"] = false,
+                            ["MeleeHitCharSndIDs"] = {
+                                [1] = 6398015798,
+                                [2] = 6398016125,
+                                [3] = 6398016391,
+                                [4] = 6398016618
+                            },
+                            ["FullyGibbedLimbChance"] = 50,
+                            ["HitCharSndPitchMin"] = 1,
+                            ["PenetrationDepth"] = 0,
+                            ["ExplosionKnockbackMultiplierOnTarget"] = 2,
+                            ["ScopeKnockbackDamper"] = 0.65,
+                            ["SelfKnockbackRedution"] = 0.8,
+                            ["ShellClipinSpeed"] = 0.5,
+                            ["MeleeAfflictionName"] = "",
+                            ["ChargingAnimationEnabled"] = false,
+                            ["PreShotgunReloadSpeed"] = 0.5,
+                            ["MinigunRevUpAnimationSpeed"] = 1,
+                            ["AfflictChance"] = 100,
+                            ["WhizSoundID"] = {
+                                [1] = 342190012,
+                                [2] = 342190017,
+                                [3] = 342190024,
+                                [4] = 342190005
+                            },
+                            ["CustomExplosion"] = false,
+                            ["HitEffectEnabled"] = true,
+                            ["ExplosionSoundEnabled"] = true,
+                            ["Affliction"] = false,
+                            ["SpinZ"] = 0,
+                            ["BaseDamage"] = 20,
+                            ["AngleZ_Min"] = -1,
+                            ["SecondaryShotgunPump"] = false,
+                            ["CooldownRate"] = 1,
+                            ["ReloadTime"] = 3,
+                            ["SniperEnabled"] = false,
+                            ["BatteryEnabled"] = false,
+                            ["HitmarkerEnabled"] = true,
+                            ["CustomHitEffect"] = false,
+                            ["DelayAfterFiring"] = 1,
+                            ["BloodWoundTexture"] = {
+                                [1] = 195871208,
+                                [2] = 4117590991,
+                                [3] = 4117589687,
+                                [4] = 4117590335
+                            },
+                            ["SpinY"] = 0,
+                            ["SpinX"] = 3,
+                            ["RecoilSpeed"] = 8,
+                            ["LightShadows"] = true,
+                            ["HitmarkerColor"] = Color3.new(1, 1, 1),
+                            ["ExplosionCraterPartColor"] = false,
+                            ["CooldownTime"] = 0.05,
+                            ["BulletHoleSize"] = 0.7,
+                            ["GoreSoundIDs"] = {
+                                [1] = 1930359546
+                            },
+                            ["ChargingSoundIncreasePitch"] = true,
+                            ["DamageDropOffEnabled"] = false,
+                            ["HitmarkerSoundPitch"] = 1,
+                            ["Spread"] = 30,
+                            ["ScopeKnockbackSpeed"] = 15,
+                            ["AngleY_Min"] = 0,
+                            ["Level2ChargingTime"] = 2,
+                            ["ShellMeshID"] = 95392019,
+                            ["MeleeBloodWoundVisibleTime"] = 3,
+                            ["LerpAlpha"] = 0.25,
+                            ["ExplosionKnockbackPower"] = 50,
+                            ["ExplosionCraterTexture"] = {
+                                [1] = 53875997
+                            },
+                            ["MinDepletion"] = 2,
+                            ["ShotgunReload"] = false,
+                            ["MarkerEffectSize"] = 0.5,
+                            ["MeleeAfflictChance"] = 100,
+                            ["DamageBasedOnDistance"] = false,
+                            ["LimitedAmmoEnabled"] = true,
+                            ["SecondaryShotgunPumpinSpeed"] = 0.5,
+                            ["RecoilDamper"] = 0.8,
+                            ["FireAnimationSpeed"] = 1,
+                            ["AmmoPerMag"] = 12,
+                            ["ExplosionSoundPitchMin"] = 1,
+                            ["EquippedAnimationSpeed"] = 1,
+                            ["ChargedShotAdvanceEnabled"] = false,
+                            ["FireRate"] = 0.45,
+                            ["ChargedShotEnabled"] = false,
+                            ["HeatPerFireMin"] = 7,
+                            ["BloodWoundSize"] = 0.5,
+                            ["MaximumRate"] = 4,
+                            ["SmokeTrailRateIncrement"] = 1,
+                            ["ChargeAlterTable"] = {},
+                            ["HitmarkerColorHS"] = Color3.new(1, 0, 0),
+                            ["MagCartridge"] = false,
+                            ["AimChargingAnimationSpeed"] = 1,
+                            ["AutoReload"] = true,
+                            ["BloodWoundEnabled"] = true,
+                            ["HeadshotDamageMultiplier"] = 2,
+                            ["MeleeHitCharSndPitchMin"] = 1,
+                            ["MeleeHitCharSndVolume"] = 1,
+                            ["TacticalReloadAnimationEnabled"] = false,
+                            ["HitSoundPitchMin"] = 1,
+                            ["MeleeBloodWoundTextureColor"] = Color3.new(1, 0, 0),
+                            ["BulletShellDelay"] = 0,
+                            ["SelfDamage"] = false,
+                            ["ProjectileType"] = "NewBullet",
+                            ["FireModes"] = {
+                                [1] = 1,
+                                [2] = 2,
+                                [3] = 3,
+                                [4] = true
+                            },
+                            ["BulletShellEnabled"] = true,
+                            ["LightRange"] = 15,
+                            ["SelfDamageRedution"] = 0.5,
+                            ["CrossSize"] = 7,
+                            ["CrossSpeed"] = 15
+                        },
+                        [2] = game:GetService("Players").LocalPlayer.Character.HumanoidRootPart,
+                        [3] = game:GetService("Players").LocalPlayer,
+                        [4] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Humanoid"),
+                        [5] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("HumanoidRootPart"),
+                        [6] = {
+                            [1] = 20,
+                            [2] = 2,
+                            [3] = true,
+                            [4] = 23.148372650146484,
+                            [5] = false,
+                            [6] = 10000,
+                            [7] = 1000
+                        },
+                        [7] = {
+                            [1] = 0,
+                            [2] = 0,
+                            [3] = false,
+                            [4] = "",
+                            [5] = 100
+                        },
+                        [8] = {
+                            [1] = false,
+                            [2] = 5,
+                            [3] = 3
+                        },
+                        [9] = workspace:WaitForChild("Misc"):WaitForChild("AI"):WaitForChild("CHAIN"):WaitForChild("Left Leg"),
+                        [10] = {
+                            [1] = false,
+                            [2] = {
+                                [1] = 1930359546
+                            },
+                            [3] = 1,
+                            [4] = 1.5,
+                            [5] = 1,
+                            [6] = game:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("ItemInfo"):WaitForChild("DoubleBarrel"):WaitForChild("GoreEffect"),
+                            [7] = 50
+                        }
+                    }
+                    
+                    game:GetService("ReplicatedStorage"):WaitForChild("GameStuff"):WaitForChild("Remotes"):WaitForChild("InflictTarget"):InvokeServer(unpack(args)) 
+            end
+            
+            for i=1,20 do
+                task.spawn(Main)
+                task.wait()
+            end
+    end
+})
+
+local SigmaShopItems = OP:CreateButton({
+    Name = "[🟢] Shop Secret Items",
+    Callback = function()
+        game.Players.LocalPlayer.PlayerGui.Ingame.Shop.MainFrame.SubSections.BuyFrame.DoubleBarrel.Visible = true
+        game.Players.LocalPlayer.PlayerGui.Ingame.Shop.MainFrame.SubSections.BuyFrame.CombatKnife.Visible = true
+    end
+})
+
+local function CallCrucifixMain()
+    local Inventory = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Inventory
+    local Img = "rbxassetid://15409902480"
+    local RE = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.MainUIHandler.Remote;
+    
+    local function sell()
+        local args = {
+            [1] = "Sell",
+            [2] = "Radio"
+        }
+    
+        RE:FireServer(unpack(args))
+    end
+    
+    local function buy()
+        local args = {
+            [1] = "Buy",
+            [2] = "Radio"
+        }
+    
+        RE:FireServer(unpack(args))
+    end
+    
+    local function main()
+        for _, Child in Inventory:GetChildren() do
+            if Child:IsA("ImageLabel") then
+                if Child:FindFirstChild("Values") and Child:FindFirstChild("Icon") and Child:FindFirstChild("Icon").Image == Img then
+                    Child.Icon.Image = "rbxassetid://15903361925"
+                    for i=1,5 do
+                        Child.Values.ItemName.Value = "Crucifix"
+                        task.wait()
+                    end
+                end
+            end
+        end
+    end
+    
+    function c()
+        sell()
+        buy()
+        task.wait(0.4)
+        main()
+        notifications:Notify("[Crucifix]: Done!")
+    end
+    
+    task.spawn(c)
+end
+
+local FakaCrucifix = Main:CreateButton({
+    Name = "[🟢] Free Crucifix",
+    Callback = CallCrucifixMain
+})
+
+local SBWindup = Main:CreateButton({
+    Name = "[🟢] SB Windup",
+    Callback = function()
+
+        if not debug.getupvalues or not getsenv then
+            return notifications:Notify("[debug]: Need 'debug.getupvalues' and 'getsenv'.")
+        end;
+
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+        RRemote:FireServer("SpellBookBegin",nil,CHA_keycode)
+    end
+})
+
+local SB_Success = OP:CreateButton({
+    Name = "[🟢] Kill Chain [Blood Moon]",
+    Callback = function()
+        local Prox222 = setmetatable({}, {
+            __index = function(n,k)
+                return game:GetService(k)
+            end
+        })
+        
+        local cMobil = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterMobility)
+        local cHandl = getsenv(workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler)
+        local CTS_keycode
+        local CHA_keycode
+        
+        local RRemote = workspace[Prox222.Players.LocalPlayer.Name].CharacterHandler.Contents.Remotes.Interact
+        
+        local function IsKeycode(_)
+            local is;
+            pcall(function()
+                is=#_ >= 20
+            end)
+        
+            return is;
+        end
+        
+        local function GetCtsKeycode()
+            for n, v in debug.getupvalues(cMobil.DodgeFunc) do
+                if IsKeycode(v) then
+                    CTS_keycode = v;
+                end
+            end
+        end
+        
+        local function GetChaKeycode()
+            for n, v in debug.getupvalues(cHandl.MacheteParrying) do
+                if IsKeycode(v) then
+                    CHA_keycode = v;
+                end
+            end
+        end
+        
+        table.foreach({1,2},function(i)
+            ({GetCtsKeycode, GetChaKeycode})[i]()
+        end)
+        RRemote:FireServer("SpellBookSuccess",nil,CHA_keycode)
+    end
+})
+
+local StamInf = false
+
+local AbcdefgIdk = Main:CreateToggle({
+    Name = "[🟢] Inf Stamina",
+    CurrentValue = false;
+    Flag = "infstam";
+    Callback = function(v)
+        StamInf = v;
+    end
+})
+
+local Inf = Main:CreateToggle({
+    Name = "[🟢] Inf Stats",
+    CurrentValue = false;
+    Flag = "infstats",
+    Callback = function(v)
+        notifications:Notify("[Infinite Stats]: Set 'infstats' to '" .. tostring(v) .. "'.")
+        infstats.Value=v
+    end
+})
+
+local BT = Main:CreateToggle({
+    Name = "[❔] ESP Bear Traps",
+    CurrentValue = false;
+    Flag = "beartraps_esp",
+    Callback = function(v)
+        notifications:Notify("[ESP Bear Traps]: Set 'beartraps_esp' to '" .. tostring(v) .. "'.")
+        espbeartraps.Value=v
+    end
+})
+
+local C_ESP = Main:CreateToggle({
+    Name = "[🟢] CHAIN Esp",
+    CurrentValue = false;
+    Flag = "chain_esp",
+    Callback = function(v)
+        notifications:Notify("[CHAIN Esp]: Set 'chain_esp' to '" .. tostring(v) .. "'.")
+        espchain.Value=v
+    end
+})  
+
+local stats = chain;
+
+local chainDistance = stats:CreateLabel("Chain Distance", "rewind")
+local alerted = stats:CreateLabel("Chain Alerted", "rewind")
+local anger = stats:CreateLabel("Chain Anger", "rewind")
+local bearTrapped = stats:CreateLabel("Is Chain Bear Trapped", "rewind")
+local burst = stats:CreateLabel("Chain Burst", "rewind")
+local charging = stats:CreateLabel("Chain Charging", "rewind")
+local chokemeter = stats:CreateLabel("Chain Choke Meter", "rewind")
+local clashing = stats:CreateLabel("Chain Clashing", "rewind")
+local invincible = stats:CreateLabel("Chain Invincible", "rewind")
+local isbm = stats:CreateLabel("Is Chain BM", "rewind")
+local requireforbm = stats:CreateLabel("Requirement for BM", "rewind")
+
+local timeleft = stats:CreateLabel("Round Time", "rewind")
+local function getTimeLeft(arg1)
+    if type(arg1) ~= "number" then
+        error("Invalid argument: arg1 must be a number representing seconds.")
+    end
+    if arg1 == 0 then
+        return "Daytime"
+    elseif arg1 < 60 then
+        return arg1 .. "s"
+    else
+        local minutes = math.floor(arg1 / 60)
+        local seconds = arg1 % 60
+        if minutes > 0 and seconds > 0 then
+            return minutes .. "m " .. seconds .. "s"
+        elseif minutes > 0 then
+            return minutes .. "m"
+        else
+            return seconds .. "s"
+        end
+    end
+end
+
+if not _ENV.FormatReal then
+    _ENV.FormatReal = true
+end
+
+local function format()
+    local AI = Dependencies.GetChainAI()
+    
+    local function setAllStatsTo(message)
+        local labelList = {
+            chainDistance, alerted, anger, bearTrapped, burst,
+            charging, chokemeter, clashing, invincible, isbm
+        }
+        local names = {
+            "Chain Distance", "Alerted", "Anger", "Bear Trapped", "Burst",
+            "Charging", "Choke Meter", "Clashing", "Invincible", "IsBM"
+        }
+
+        for i, label in ipairs(labelList) do
+            label:Set(string.format("%s: %s", names[i], message), 4483362458, Color3.fromRGB(30, 30, 30), false)
+        end
+    end
+
+    if AI then
+        local aiRoot = AI:FindFirstChild("HumanoidRootPart")
+        
+        if aiRoot then
+            if not _ENV.FormatReal then return end
+            
+            local char = Dependencies.GetCurrentCharacter()
+            local charRoot = char and char:FindFirstChild("HumanoidRootPart")
+
+            if charRoot then
+                local distance = math.floor((aiRoot.Position - charRoot.Position).Magnitude)
+                chainDistance:Set(string.format("Chain Distance: %s studs", tostring(distance)))
+            else
+                chainDistance:Set("Chain Distance: N/A")
+            end
+
+            local attributes = {
+                { attr = "Alerted", label = alerted },
+                { attr = "Anger", label = anger, round = true },
+                { attr = "BearTrapped", label = bearTrapped },
+                { attr = "Burst", label = burst },
+                { attr = "Charging", label = charging },
+                { attr = "ChokeMeter", label = chokemeter },
+                { attr = "Clashing", label = clashing },
+                { attr = "Invincible", label = invincible },
+                { attr = "IsBM", label = isbm },
+            }
+
+            for _, entry in pairs(attributes) do
+                local val = AI:GetAttribute(entry.attr)
+                local displayVal = val ~= nil and tostring(entry.round and math.floor(val) or val) or "N/A"
+                entry.label:Set(string.format("%s: %s", entry.attr, displayVal), 4483362458, Color3.fromRGB(30, 30, 30), false)
+            end
+
+            local timeLeft = getTimeLeft(workspace.GameStuff.Values:GetAttribute("RoundTime"))
+            timeleft:Set(string.format("Round Time: %s", tostring(timeLeft)))
+
+            local requirement = AI:GetAttribute("RequirementForAnger")
+            requireforbm:Set(string.format("Requirement for BM: %s", tostring(requirement)), 4483362458, Color3.fromRGB(30, 30, 30), false)
+        else
+            setAllStatsTo("N/A [NoRoot]")
+        end
+    else
+        setAllStatsTo("N/A [Despawn]")
+    end
+
+    local player = game:GetService("Players").LocalPlayer
+    local gui = player:WaitForChild("PlayerGui")
+    local ingame = gui:WaitForChild("Ingame")
+    local frame = ingame:WaitForChild("MechanicsFrame")
+
+    frame:WaitForChild("CursedText").Visible = false
+    frame:WaitForChild("StaticRegular").Visible = false
+    frame:WaitForChild("StaticScare").Visible = false
+    frame:WaitForChild("WhiteLines").Visible = false
+    ingame:WaitForChild("grain").Visible = false
+end
+
+local interval = 0.15
+local last=0
+
+game:GetService("RunService").Heartbeat:Connect(function(dt)
+    last = last + dt
+    if last>interval then
+        last = 0
+        format()
+    end
+end)
+
+local interval2 = 0.05      
+local last2 = 0
+local latestAI = nil
+
+local angerNotified, burstNotified, chokeNotified = false, false, false
+task.wait(0.06)
+if not _ENV.RunServiceLoop then
+    _ENV.RunServiceLoop = true
+end
+
+_ENV.Logs = game:GetService("RunService").Heartbeat:Connect(function(dt)
+    last2 = last2 + dt
+    if last2 > interval2 then
+        if not _ENV.RunServiceLoop then
+            _ENV.Logs:Disconnect()
+        end
+
+        last2 = 0
+
+        if latestAI == nil then
+            latestAI = Dependencies.GetChainAI()
+        end
+
+        if latestAI then
+            local angerValue = latestAI:GetAttribute("Anger")
+            local burstValue = latestAI:GetAttribute("Burst") 
+            local chokemeterValue = latestAI:GetAttribute("ChokeMeter")
+            local req = latestAI:GetAttribute("RequirementForAnger")
+            
+            if (math.floor(req - 5)) == math.floor(angerValue) then
+                local op = tostring((math.floor(req - 5)))
+                if not angerNotified then
+                    angerNotified = true
+                    notifications:Notify(string.format(
+                        "[WARNING]: Chain's anger is currently %s, blood moon is nearby.",
+                        op
+                    ))
+                end
+            else
+                angerNotified = false
+            end
+
+            
+            if burstValue > 90 then
+                if not burstNotified then
+                    burstNotified = true
+                    notifications:Notify("[WARNING]: Chain's Burst is above 90, the next few hits will cause him to explode.")
+                end
+            else
+                burstNotified = false
+            end
+
+            
+            if chokemeterValue > 90 then
+                if not chokeNotified then
+                    chokeNotified = true
+                    notifications:Notify("[WARNING]: Chain's Choke Meter is above 90, the next few hits will cause him to choke a player.")
+                end
+            else
+                chokeNotified = false
+            end
+        end
+    end
+end)
+
+local virtual_key_codes = {
+    A = 0x41, B = 0x42, C = 0x43, D = 0x44, E = 0x45,
+    F = 0x46, G = 0x47, H = 0x48, I = 0x49, J = 0x4A,
+    K = 0x4B, L = 0x4C, M = 0x4D, N = 0x4E, O = 0x4F,
+    P = 0x50, Q = 0x51, R = 0x52, S = 0x53, T = 0x54,
+    U = 0x55, V = 0x56, W = 0x57, X = 0x58, Y = 0x59,
+    Z = 0x5A,
+    ["0"] = 0x30, ["1"] = 0x31, ["2"] = 0x32, ["3"] = 0x33,
+    ["4"] = 0x34, ["5"] = 0x35, ["6"] = 0x36, ["7"] = 0x37,
+    ["8"] = 0x38, ["9"] = 0x39,
+}
+
+
+local function pressKey(key)
+    local upperedkey = string.upper(key)
+    local keycode = virtual_key_codes[upperedkey]
+
+    if keycode then
+        keypress(keycode)
+        task.wait()
+        keyrelease(keycode)
+    else
+
+    end
+end
+
+_ENV.Connections = _ENV.Connections or {}
+_ENV.QTE_Enabled = nil
+
+local autoqte = false
+local autosawqte = false
+local infcs = false
+
+local AutoQTE = Main:CreateButton({
+    Name = "[🟢] Init Auto QTE",
+    Callback = function()
+        notifications:Notify("[Init Auto QTE]: Initialized!")
+        if _ENV.QTE_Enabled then
+            _ENV.QTE_Enabled = nil
+        end 
+
+        if _ENV.Connections.QTEConnection then
+            _ENV.Connections.QTEConnection:Disconnect()
+        end
+
+        local NormalQTE = GameService:GetService("Players").LocalPlayer.PlayerGui.Ingame.MechanicsFrame.QTE
+        _ENV.QTE_Enabled = true
+
+        _ENV.Connections.QTEConnection = NormalQTE:GetPropertyChangedSignal("Visible"):Connect(function()
+            if not autoqte or not _ENV.QTE_Enabled then return end
+            if NormalQTE.Visible then
+                notifications:Notify("[Auto QTE]: true")
+                local key = tostring(NormalQTE.ImageButton.PC.Text)
+                repeat
+                    pressKey(key)
+                    task.wait()
+                until not NormalQTE.Visible or not autoqte or not _ENV.QTE_Enabled
+                notifications:Notify("[Auto QTE]: Finished!")
+            end
+        end)
+    end
+})
+
+local AutoQTE2 = Main:CreateButton({
+    Name = "[🟢] Init Inf CS",
+    Callback = function()
+        local success, notifyErr = pcall(function()
+            notifications:Notify("[Init InfCS]: Initialized!")
+        end)
+        
+        if not success then
+            
+        end
+
+        task.spawn(function()
+            while true do
+                local loopSuccess, loopErr = pcall(function()
+                    if type(infcs) == "boolean" and infcs then
+                        local player = Prox.Players.LocalPlayer;
+                        if player then
+                            local character = workspace:FindFirstChild(player.Name)
+                            if character then
+                                local stats = character:FindFirstChild("Stats")
+                                if stats then
+                                    local clashStrength = stats:FindFirstChild("ClashStrength")
+                                    if clashStrength and typeof(clashStrength.Value) == "number" then
+                                        if clashStrength.Value < 100 then
+                                            local setSuccess, setErr = pcall(function()
+                                                clashStrength.Value = 100
+                                            end)
+                                            if not setSuccess then
+
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end)
+                
+                if not loopSuccess then
+                end
+
+                task.wait(0.05)
+            end
+        end)
+    end
+})
+
+local SnowballMaker = Main:CreateButton({
+    Name = "[🟢] S".."n".."ow".."ball",
+    Callback = function()
+        local l__Noti__l = notifications
+        local l__PlrSvc__l = game:GetService("P".."l".."a".."y".."e".."r".."s")
+        local A671 = l__PlrSvc__l["L".."o".."c".."a".."l".."P".."l".."a".."y".."e".."r"]
+        local Vx101 = workspace[A671["N".."a".."m".."e"]]
+        local V808 = getsenv
+        if not V808 then
+            local f
+                = getexecutorname
+                or identifyexecutor
+                or retrieveexecutorname
+                or nil
+            local s,e=pcall(function()
+                l__Noti__l:Notify("[S".."nowballMaker] Your executor ("..f()..") does not support this function.")
+            end)
+            if not s then
+                l__Noti__l:Notify("[SnowballMaker] Your executor does not support this function.")
+            end
+            return;
+        end
+
+        if not Vx101 then
+            pcall(function()
+                l__Noti__l:Notify("[SnowballMaker] Character missing from workspace.")
+            end)
+            return;
+        end
+
+        local V112, Vx303
+        local V337 = Vx101
+        local V443, Vx505 = pcall(function()
+            V112 = V808(V337["C".."h".."a".."r".."a".."c".."t".."e".."r".."H".."a".."n".."d".."l".."e".."r"])
+        end)
+
+        if Vx505 then
+            pcall(function()
+                l__Noti__l:Notify("[SnowballMaker] Error: " .. tostring(Vx505))
+            end)
+            return;
+        end
+
+        if V443 then
+            local s,e = pcall(function()
+                V112 = V112.makeSnowBall
+            end)
+
+            if not s then
+                l__Noti__l:Notify("[SnowballMaker] Func is nil/env may be spoofed.")
+                return;
+            end
+
+            local function Vx999(A213)
+                local A902 = tostring(A213)
+                local l__Subbed__l = string.gsub(A902, "function: ", "")
+                return l__Subbed__l
+            end
+
+            l__Noti__l:Notify("[SnowballMaker] Source confirmed.")
+            l__Noti__l:Notify("[SnowballMaker] Located at " .. Vx999(V112))
+            task.wait(0.2)
+            task.spawn(V112)
+            l__Noti__l:Notify("[SnowballMaker] Maker executed.")
+        end
+    end
+})
+
+local InitX = Main:CreateButton({
+    Name = "[🟢] Init X Auto QTE",
+    Callback = function()
+        notifications:Notify("[Init XSAW Auto QTE]: Initialized!")
+        if _ENV.XSAWQTE_Enabled then
+            _ENV.XSAWQTE_Enabled = nil
+        end 
+
+        if _ENV.Connections.XSAWQTEConnection then
+            _ENV.Connections.XSAWQTEConnection:Disconnect()
+        end
+
+        local QTE = game:GetService("Players").LocalPlayer.PlayerGui.Ingame.MechanicsFrame.QTEXSaw
+        local KeyLabel = QTE.ImageButton.PC
+        local DoubleF = false;
+        local FC = 0
+        
+        _ENV.XSAWQTE_Enabled = true
+        _ENV.Connections.XSAWQTEConnection = QTE:GetPropertyChangedSignal("Visible"):Connect(function()
+            if _ENV.XSAWQTE_Enabled and QTE.Visible then
+                notifications:Notify("[Auto XSAW QTE]: Started!")
+                local lastKey = ""
+                local pressedKeys = {}
+                local keyCount = 0
+                while QTE.Visible and _ENV.XSAWQTE_Enabled and keyCount <= 5 do
+                    local currentKey = tostring(KeyLabel.Text)
+                    if currentKey and currentKey ~= lastKey and not pressedKeys[currentKey] then
+                        pressKey(currentKey)
+                        notifications:Notify("[Auto XSAW QTE]: pressed " .. currentKey)
+                        if currentKey:lower() == "f" then
+                            FC += 1
+                            if FC == 2 then
+                                DoubleF = true
+                            end
+                        end
+                        pressedKeys[currentKey] = true
+                        lastKey = currentKey
+                        keyCount += 1
+                        task.wait()
+                    end
+                    task.wait()
+                end
+                notifications:Notify("[Auto XSAW QTE]: QTE over")
+            end
+        end)
+        notifications:Notify("[Auto XSAW QTE]: listening")
+    end
+})
+
+local SBQuest = Main:CreateButton({
+    Name = "[🟢] Claim SB Quest",
+    Callback = function()
+        notifications:Notify("[Claim Spell Book Quest]: 7 DAYS MUST HAVE PASSED SINCE LAST RESTART")
+        --// Source: game.ReplicatedStorage.GameStuff.NPCS.SQ_1.NPC
+        local ReplicatedStorage_upvr = game:GetService("Repli" .. "cated" .. "Sto" .. "rage")
+        local GameStuff = ReplicatedStorage_upvr:WaitForChild("Game" .. "Stuff")
+        local Remotes = GameStuff["Re" .. "motes"]
+        local Quest = Remotes["Que" .. "st"]
+        local Artifacts = "ArtifactsBlueprint"
+
+        Quest:FireServer(Artifacts)
+        notifications:Notify("[Claim Spell Book Quest]: Fired Event")
+    end
+})
+
+if istheplayersigma then
+    local Infinita = Dev:CreateButton({
+        Name = "[🟢] Inf Yield",
+        Callback = function()
+            notifications:Notify("[Infinite Yield] Loading")
+            loadstring(game:HttpGet(('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'),true))()
+        end
+    })
+end
+
+local AutoQTE = Main:CreateToggle({
+    Name = "[🟢] Auto QTE",
+    CurrentValue = false;
+    Flag = "autoqteMachete",
+    Callback = function(v)
+        notifications:Notify("[Auto QTE]: Set 'AutoQTE' to '" .. tostring(v) .. "'.")
+        autoqte = v
+    end
+})
+
+local AutoXSAWQTE = Main:CreateToggle({
+    Name = "[🟢] Auto X QTE",
+    CurrentValue = false;
+    Flag = "autoqteXsaw",
+    Callback = function(v)
+        notifications:Notify("[Auto XSAW QTE]: Set 'AutoQTE' to '" .. tostring(v) .. "'.")
+        autosawqte = v
+    end
+})
+
+local InfCS = Main:CreateToggle({
+    Name = "[🟢] Inf CS",
+    CurrentValue = false;
+    Flag = false;
+    Callback = function(v)
+        infcs = v;
+        notifications:Notify("[Infinite Clash Strength]: Set 'InfCS' to '" .. tostring(infcs) .. "'.")
+    end
+})
+
+local Safezone = OP:CreateButton({
+    Name = "[🟢] Tp Safe Zone",
+    Callback = function()
+        notifications:Notify("[Safe Zone] Teleporting")
+        local cf = CFrame.new(173, -44, 428)
+        local speaker = GameService:GetService("Players").LocalPlayer
+        local function Noclip(v1,v2)
+            for _, child in pairs(speaker.Character:GetDescendants()) do
+                if child:IsA("BasePart") and child.CanCollide == v1 then
+                    child.CanCollide = v2
+                end
+            end
+        end
+
+        Noclip(true,false)
+        speaker.Character.HumanoidRootPart.CFrame = cf
+        notifications:Notify("[Safe Zone] Teleported!")
+    end
+})
+
+local Rnoclip = Main:CreateButton({
+    Name = "[🟢] Remove Noclip",
+    Callback = function()
+        local speaker = GameService:GetService("Players").LocalPlayer
+        local function Noclip(v1,v2)
+            for _, child in pairs(speaker.Character:GetDescendants()) do
+                if child:IsA("BasePart") and child.CanCollide == v1 then
+                    child.CanCollide = v2       
+                end
+            end
+        end
+
+        Noclip(false,true)
+        speaker.Character:FindFirstChildWhichIsA("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+        notifications:Notify("[Noclip] Removed Noclip.")
+    end
+})
+
+local SBT = OP:CreateButton({
+    Name = "[🟢] Spoof Placed BT", -- Explanation: Can place more than max beartrap in 1 night
+    Callback = function()
+        notifications:Notify("[Spoof Placed Beartrap]: Done!")
+        game:GetService("Players").LocalPlayer.PlayerStats:SetAttribute("BearTrapPlaced",false)
+    end
+})
+
+local misc = workspace.Misc
+local beartraps = workspace.GameStuff.PlayerStuff.BearTraps
+
+local function spoofbeartrap()
+    notifications:Notify("[SpoofBearTrap]: Spoofing...")
+    for _, v in beartraps:GetChildren() do
+        v.Parent = misc
+        notifications:Notify("[SpoofBearTrap]: Spoofed " .. v.Name)
+    end
+
+    notifications:Notify("[SpoofBearTrap]: Done!")
+end
+
+local function unspoofbeartrap()
+    notifications:Notify("[UnspoofBearTrap]: Unspoofing...")
+    for _, v in misc:GetChildren() do
+        if v.Name == "BearTrap" then
+            v.Parent = beartraps
+            notifications:Notify("[UnspoofBearTrap]: Unspoofed " .. v.Name)
+        end
+    end
+
+    notifications:Notify("[UnspoofBearTrap]: Done!")
+end
+
+local aaaaaaaaaaaaaaaa = OP:CreateButton({
+    Name = "[🟢] Spoof Beartrap",
+    Callback = spoofbeartrap
+})
+
+local Uuuuuu = OP:CreateButton({
+    Name = "[🟢] Unspoof Beartrap",
+    Callback = unspoofbeartrap
+})
+
+local renamedbecausepastebinwontletmesaythenwordlolol = Main:CreateButton({
+    Name = "[🟢] Remove ScareStatic Sound",
+    Callback = function()
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Static.Volume = 0
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Scare.Themes.Scare.Volume = 0
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Scare.ScareStatic.Volume = 0
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Static.PlaybackSpeed = 0
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Scare.Themes.Scare.PlaybackSpeed = 0
+        game:GetService("Players").LocalPlayer.PlayerGui.Ingame.Contents.Sounds.Scare.ScareStatic.PlaybackSpeed = 0
+    end
+})
+
+local Idk = Main:CreateToggle({
+    Name = "[❔] Artifact ESP",
+    CurrentValue = false;
+    Flag = "artifactesp",
+    Callback = function(v)
+        espartifacts.Value = v
+    end
+})
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerStats = LocalPlayer.PlayerStats
+
+local function hb_upd(dt)
+    if infstats then
+        __met[1](infstats.Value)
+    end
+
+    if StamInf then
+        pcall(function()
+            if workspace[Prox.Players.LocalPlayer.Name].Stats.Stamina.Value < 80 then
+                repeat
+                    workspace[Prox.Players.LocalPlayer.Name].Stats.Stamina.Value += 1
+                    task.wait()
+                until workspace[Prox.Players.LocalPlayer.Name].Stats.Stamina.Value > 80
+            end
+        end)
+    end
+
+    if DoFOV then
+        workspace.CurrentCamera.FieldOfView = tonumber(SetFOV)
+    end
+
+    if espchain and espchain.Value and Dependencies.GetChainAI() then
+        local ia = Dependencies.GetChainAI()
+        Dependencies.CreateChainESP(ia, true)
+    end
+
+    if espartifacts and espartifacts.Value then
+        for _, artifact in artifactsartifacts:GetChildren() do
+            if isArtifactActive(artifact) then
+                createanormalespfr(artifact, true)
+            end
+        end
+    end
+
+    if Useless then
+        PlayerStats:SetAttribute("BearTrapPlaced", false)
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(hb_upd)
+MainScript:Init()
+
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
+-- "[🟢] Abc"
