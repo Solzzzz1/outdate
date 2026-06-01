@@ -1,7 +1,7 @@
 local players = game:GetService("Players")
 local filename = "day_time_ambiance.mp3"
 
-local audio_data = game:HttpGet("https://github.com/Solzzzz1/archivos/blob/main/day%20time%20ambiance.mp3?raw=true")
+local audio_data = game:HttpGet("https://github.com/Solzzzz1/outdate/blob/main/day%20time%20ambiance.mp3?raw=true")
 writefile(filename, audio_data)
 
 local asset_id = getcustomasset(filename)
